@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/vadim-ivlev/voiceover/internal/app"
-	"github.com/vadim-ivlev/voiceover/pkg/sound"
+	"github.com/vadim-ivlev/voiceover/internal/sound"
 )
 
 func main() {

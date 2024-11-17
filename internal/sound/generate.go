@@ -7,22 +7,36 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 
+	"github.com/rs/zerolog/log"
 	"github.com/vadim-ivlev/voiceover/internal/config"
 )
 
 type requestBody struct {
-	Model string `json:"model"`
-	Input string `json:"input"`
-	Voice string `json:"voice"`
+	Model string  `json:"model"`
+	Input string  `json:"input"`
+	Voice string  `json:"voice"`
+	Speed float64 `json:"speed"`
 }
 
-func GenerateMP3(text, fileName string) error {
+// alloy, echo, fable, onyx, nova, shimmer
+const (
+	VoiceAlloy   = "alloy"
+	VoiceEcho    = "echo"
+	VoiceFable   = "fable"
+	VoiceOnyx    = "onyx"
+	VoiceNova    = "nova"
+	VoiceShimmer = "shimmer"
+)
+
+func GenerateMP3(speed float64, voice, text, fileName string) error {
 	url := config.Params.BaseURL + "/v1/audio/speech"
 	body := requestBody{
 		Model: "tts-1",
 		Input: text,
-		Voice: "alloy",
+		Voice: voice,
+		Speed: speed,
 	}
 
 	jsonBody, err := json.Marshal(body)
@@ -58,6 +72,25 @@ func GenerateMP3(text, fileName string) error {
 	_, err = io.Copy(outFile, resp.Body)
 	if err != nil {
 		return fmt.Errorf("failed to write to file: %v", err)
+	}
+
+	return nil
+}
+
+// GenerateSilenceMP3 - creates a  mp3 file that contains silence using ffmpeg.
+// Parameters:
+// fileName - the name of the file to create.
+// duration - the duration of the silence in seconds.
+func GenerateSilenceMP3(fileName string, duration float64) error {
+	// Construct the ffmpeg command
+	durationStr := fmt.Sprintf("%f", duration)
+	log.Info().Msgf("Duration: %s", durationStr)
+	cmd := exec.Command("ffmpeg", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=mono", "-t", durationStr, "-q:a", "9", "-acodec", "libmp3lame", fileName)
+
+	// Run the ffmpeg command
+	err := cmd.Run()
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -1,0 +1,14 @@
+{
+    "go.testFlags": [
+    "-v",
+    "-count=1",
+    // "-timeout=200s"
+    ]
+    ,
+    // "gopls": { 
+    //     "ui.semanticTokens": true,
+    //     "ui.diagnostic.staticcheck": true
+    // },
+    
+
+}
