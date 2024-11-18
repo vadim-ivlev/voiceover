@@ -10,9 +10,7 @@ import (
 
 type Job struct {
 	// Unique identifier for the job
-	ID int `json:"id,omitempty"`
-	// JobID
-	JobID string `json:"job_id,omitempty"`
+	ID int `json:"id"`
 	// Text to process
 	Text string `json:"text,omitempty"`
 	// Request time
