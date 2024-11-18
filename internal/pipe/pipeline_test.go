@@ -7,7 +7,7 @@ func TestStartTestPipeline(t *testing.T) {
 		name string
 	}{
 		{
-			name: "Test StartPipeline",
+			name: "Test StartTestPipeline",
 		},
 	}
 	for _, tt := range tests {

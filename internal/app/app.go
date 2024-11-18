@@ -36,5 +36,4 @@ func InitApp() {
 	if err != nil {
 		log.Error().Msg(err.Error())
 	}
-
 }

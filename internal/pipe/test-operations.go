@@ -3,6 +3,7 @@ package pipe
 import (
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"golang.org/x/exp/rand"
 )
 
@@ -23,4 +24,20 @@ func square(job Job) Job {
 func cube(job Job) Job {
 	Nap(100)
 	return job
+}
+
+func StartTestPipeline() {
+	// Create a job queue
+	jobs := make(chan Job)
+	go GenerateJobs(10, 0, jobs)
+
+	squaredJobs := make(chan Job, 50)
+	doTeamWork(4, "SquareW", square, jobs, squaredJobs)
+
+	cubedJobs := make(chan Job, 50)
+	doTeamWork(3, "CubeW", cube, squaredJobs, cubedJobs)
+
+	// gatther the jobs into an array
+	processedJobs := toArray(cubedJobs)
+	log.Info().Msg(PrettyJSON(processedJobs))
 }

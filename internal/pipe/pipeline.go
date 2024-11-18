@@ -6,6 +6,31 @@ import (
 	"time"
 )
 
+// newJobsArray - creates an array of jobs.
+func newJobsArray(numJobs int) []Job {
+	jobs := make([]Job, numJobs)
+	for i := 0; i < numJobs; i++ {
+		jobs[i] = createJob(i)
+		LogJob(jobs[i], "created in array")
+	}
+	return jobs
+}
+
+// toChannel - moves the jobs from the array to the channel
+// Parameters:
+// jobsArray: the array of jobs
+// jobsChan: the channel to send the jobs to
+// napTime: the time to sleep after sending a job
+func toChannel(jobsArray []Job, jobsChan chan Job, napTime int) {
+	for _, job := range jobsArray {
+		jobsChan <- job
+		if napTime > 0 {
+			Nap(napTime)
+		}
+	}
+	close(jobsChan)
+}
+
 // GenerateJobs - Stage1. creates jobs and sends them to the out channel.
 // Parameters:
 // numJobs: the number of jobs to create
@@ -30,7 +55,7 @@ func GenerateJobs(numJobs, napTime int, out chan Job) {
 // operation: the operation to execute on the job
 // in: a channel to receive the jobs from
 // out: a channel to send the jobs to
-func DoWork(wg *sync.WaitGroup, workerName string, operation func(Job) Job, in <-chan Job, out chan<- Job) {
+func DoWork(wg *sync.WaitGroup, workerName string, operation JobFunction, in <-chan Job, out chan<- Job) {
 	defer wg.Done()
 	for job := range in {
 		logRecord := ProcessLogRecord{
@@ -52,8 +77,8 @@ func DoWork(wg *sync.WaitGroup, workerName string, operation func(Job) Job, in <
 	// close(out)
 }
 
-// DoTeamWork - creates a team of workers to process the jobs.
-func DoTeamWork(workersNumber int, workerNamePrefix string, operation func(Job) Job, in <-chan Job, out chan<- Job) {
+// doTeamWork - creates a team of workers to process the jobs.
+func doTeamWork(workersNumber int, workerNamePrefix string, operation JobFunction, in <-chan Job, out chan<- Job) {
 	// wait group to wait for the workers to finish
 	wg := sync.WaitGroup{}
 	for i := 0; i < workersNumber; i++ {
@@ -64,8 +89,4 @@ func DoTeamWork(workersNumber int, workerNamePrefix string, operation func(Job) 
 	// wait for the workers to finish
 	wg.Wait()
 	close(out)
-}
-
-func StartPipeline() {
-	// Create a job queue
 }

@@ -30,6 +30,18 @@ const (
 	VoiceShimmer = "shimmer"
 )
 
+var currentVoice = -1
+
+// Returns next voice in the circular list of voices.
+func NextVoice() string {
+	voices := []string{VoiceAlloy, VoiceEcho, VoiceFable, VoiceOnyx, VoiceNova, VoiceShimmer}
+	currentVoice++
+	if currentVoice >= len(voices) || currentVoice < 0 {
+		currentVoice = 0
+	}
+	return voices[currentVoice]
+}
+
 func GenerateMP3(speed float64, voice, text, fileName string) error {
 	url := config.Params.BaseURL + "/v1/audio/speech"
 	body := requestBody{

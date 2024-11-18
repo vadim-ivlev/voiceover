@@ -9,6 +9,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// JobFunction - function that processes a job.
+// It takes a job and returns a modified job.
+type JobFunction func(Job) Job
+
 type ProcessLogRecord struct {
 	JobID           int           `json:"job_id"`
 	WorkerName      string        `json:"worker_name"`
@@ -23,7 +27,9 @@ type Job struct {
 	// Unique identifier for the job
 	ID int `json:"id"`
 	// Text to process
-	Text string `json:"text,omitempty"`
+	Text string `json:"text"`
+	// Voice
+	Voice string `json:"voice,omitempty"`
 	// Request time
 	RequestTime string `json:"request_time,omitempty"`
 	// Request duration
@@ -34,10 +40,6 @@ type Job struct {
 	TextFile string `json:"text_file,omitempty"`
 	// Audio file
 	AudioFile string `json:"audio_file,omitempty"`
-	// // Processed by worker
-	// ProcessedBy string `json:"processed_by,omitempty"`
-	// // Result Messages
-	// ResultMessages string `json:"result_messages,omitempty"`
 	// Process Log. Records of the processing steps for the job
 	ProcessLog []ProcessLogRecord `json:"process_log,omitempty"`
 }
