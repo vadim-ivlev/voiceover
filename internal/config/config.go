@@ -18,6 +18,14 @@ type config struct {
 	SoundsDir string `env:"SOUNDS_DIR" envDefault:"./.data/sounds"`
 }
 
+func (c config) String() string {
+	bytes, err := json.MarshalIndent(c, "", "  ")
+	if err != nil {
+		log.Error().Msg(err.Error())
+	}
+	return string(bytes)
+}
+
 // Params - переменная для хранения параметров приложения
 var Params config = config{}
 
@@ -51,10 +59,4 @@ func JSONString(params interface{}) string {
 		log.Error().Msg(err.Error())
 	}
 	return string(bytes)
-}
-
-// PrintParams - выводит параметры приложения в лог
-func PrintParams() {
-	log.Info().Msg("Параметры приложения:\n" + JSONString(Params))
-	JSONString(Params)
 }

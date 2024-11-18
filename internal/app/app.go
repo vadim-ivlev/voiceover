@@ -24,7 +24,8 @@ func InitApp() {
 		config.Params.ApiKey = os.Getenv("OPENAI_API_KEY")
 	}
 
-	config.PrintParams()
+	log.Info().Msg("Application started.")
+	// log.Info().Msg(config.Params.String())
 
 	// Create directories for texts and sounds
 	err := os.MkdirAll(config.Params.TextsDir, 0755)

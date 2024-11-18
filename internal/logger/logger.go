@@ -15,5 +15,5 @@ func InitializeLogger() {
 	// цветной лог в консоль
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, NoColor: NoColor})
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	log.Info().Msg("Logger initialized")
+	// log.Info().Msg("Logger initialized")
 }
