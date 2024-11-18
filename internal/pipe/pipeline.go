@@ -1,6 +1,7 @@
 package pipe
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
@@ -49,6 +50,20 @@ func DoWork(wg *sync.WaitGroup, workerName string, operation func(Job) Job, in <
 		out <- job
 	}
 	// close(out)
+}
+
+// DoTeamWork - creates a team of workers to process the jobs.
+func DoTeamWork(workersNumber int, workerNamePrefix string, operation func(Job) Job, in <-chan Job, out chan<- Job) {
+	// wait group to wait for the workers to finish
+	wg := sync.WaitGroup{}
+	for i := 0; i < workersNumber; i++ {
+		wg.Add(1)
+		workerName := fmt.Sprintf("%s-%d", workerNamePrefix, i)
+		go DoWork(&wg, workerName, operation, in, out)
+	}
+	// wait for the workers to finish
+	wg.Wait()
+	close(out)
 }
 
 func StartPipeline() {

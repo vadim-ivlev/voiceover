@@ -42,11 +42,23 @@ type Job struct {
 	ProcessLog []ProcessLogRecord `json:"process_log,omitempty"`
 }
 
-// String - String representation of the job
-func (j *Job) String() string {
-	bytes, err := json.MarshalIndent(j, "", "  ")
+func CompactJSON(data interface{}) string {
+	bytes, err := json.Marshal(data)
 	if err != nil {
 		log.Error().Msg(err.Error())
 	}
 	return string(bytes)
+}
+
+func PrettyJSON(data interface{}) string {
+	bytes, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		log.Error().Msg(err.Error())
+	}
+	return string(bytes)
+}
+
+// String - String representation of the job
+func (j *Job) String() string {
+	return PrettyJSON(j)
 }
