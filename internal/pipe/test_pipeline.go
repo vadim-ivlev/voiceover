@@ -25,9 +25,10 @@ func StartTestPipeline() {
 	close(squaredJobs)
 
 	cubedJobs := make(chan Job, 50)
-	wg.Add(1)
-	go DoWork(&wg, "CubeW1", cube, squaredJobs, cubedJobs)
-	wg.Wait()
+	wg1 := sync.WaitGroup{}
+	wg1.Add(1)
+	go DoWork(&wg1, "CubeW1", cube, squaredJobs, cubedJobs)
+	wg1.Wait()
 	close(cubedJobs)
 
 	// Consume the output

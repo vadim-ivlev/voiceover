@@ -2,7 +2,7 @@ package pipe
 
 import "testing"
 
-func TestStartPipeline(t *testing.T) {
+func TestStartTestPipeline(t *testing.T) {
 	tests := []struct {
 		name string
 	}{
@@ -12,7 +12,7 @@ func TestStartPipeline(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			StartPipeline()
+			StartTestPipeline()
 		})
 	}
 }
