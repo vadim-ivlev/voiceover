@@ -17,13 +17,13 @@ func Nap(milliseconds int) {
 // square - square the number
 func square(job Job) Job {
 	Nap(2000)
-	job.Test += fmt.Sprintf("Job %d squared. ", job.ID)
+	job.ResultMessages += fmt.Sprintf("Job %d squared. ", job.ID)
 	return job
 }
 
 // cube - cube the number
 func cube(job Job) Job {
 	Nap(100)
-	job.Test += fmt.Sprintf("Job %d cubed. ", job.ID)
+	job.ResultMessages += fmt.Sprintf("Job %d cubed. ", job.ID)
 	return job
 }

@@ -23,10 +23,10 @@ type Job struct {
 	TextFile string `json:"text_file,omitempty"`
 	// Audio file
 	AudioFile string `json:"audio_file,omitempty"`
-	// Executed by
-	ExecutedBy string `json:"executed_by,omitempty"`
-	// Test
-	Test string `json:"test,omitempty"`
+	// Processed by worker
+	ProcessedBy string `json:"processed_by,omitempty"`
+	// Result Messages
+	ResultMessages string `json:"result_messages,omitempty"`
 }
 
 // String - String representation of the job
