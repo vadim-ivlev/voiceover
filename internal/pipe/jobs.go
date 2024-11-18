@@ -4,9 +4,20 @@ package pipe
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/rs/zerolog/log"
 )
+
+type ProcessLogRecord struct {
+	JobID       int           `json:"job_id"`
+	WorkerName  string        `json:"worker_name"`
+	StartTime   time.Time     `json:"start_time"`
+	EndTime     time.Time     `json:"end_time"`
+	Duration    time.Duration `json:"duration"`
+	DurationSec float64       `json:"duration_sec"`
+	Error       string        `json:"error"`
+}
 
 type Job struct {
 	// Unique identifier for the job
@@ -23,10 +34,12 @@ type Job struct {
 	TextFile string `json:"text_file,omitempty"`
 	// Audio file
 	AudioFile string `json:"audio_file,omitempty"`
-	// Processed by worker
-	ProcessedBy string `json:"processed_by,omitempty"`
-	// Result Messages
-	ResultMessages string `json:"result_messages,omitempty"`
+	// // Processed by worker
+	// ProcessedBy string `json:"processed_by,omitempty"`
+	// // Result Messages
+	// ResultMessages string `json:"result_messages,omitempty"`
+	// Process Log. Records of the processing steps for the job
+	ProcessLog []ProcessLogRecord `json:"process_log,omitempty"`
 }
 
 // String - String representation of the job

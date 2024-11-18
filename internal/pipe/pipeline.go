@@ -2,6 +2,7 @@ package pipe
 
 import (
 	"sync"
+	"time"
 )
 
 // GenerateJobs - Stage1. creates jobs and sends them to the out channel.
@@ -31,8 +32,19 @@ func GenerateJobs(numJobs, napTime int, out chan Job) {
 func DoWork(wg *sync.WaitGroup, workerName string, operation func(Job) Job, in <-chan Job, out chan<- Job) {
 	defer wg.Done()
 	for job := range in {
+		logRecord := ProcessLogRecord{
+			JobID:      job.ID,
+			WorkerName: workerName,
+			StartTime:  time.Now(),
+		}
+
 		job = operation(job)
-		job.ProcessedBy += workerName + ", "
+
+		logRecord.EndTime = time.Now()
+		logRecord.Duration = logRecord.EndTime.Sub(logRecord.StartTime)
+		logRecord.DurationSec = logRecord.Duration.Seconds()
+
+		job.ProcessLog = append(job.ProcessLog, logRecord)
 		LogJob(job, "done by "+workerName)
 		out <- job
 	}
