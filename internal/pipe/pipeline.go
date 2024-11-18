@@ -43,7 +43,7 @@ func DoWork(wg *sync.WaitGroup, workerName string, operation func(Job) Job, in <
 
 		logRecord.EndTime = time.Now()
 		logRecord.Duration = logRecord.EndTime.Sub(logRecord.StartTime)
-		logRecord.DurationSec = logRecord.Duration.Seconds()
+		logRecord.DurationSeconds = logRecord.Duration.Seconds()
 
 		job.ProcessLog = append(job.ProcessLog, logRecord)
 		LogJob(job, "done by "+workerName)

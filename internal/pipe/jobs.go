@@ -10,13 +10,13 @@ import (
 )
 
 type ProcessLogRecord struct {
-	JobID       int           `json:"job_id"`
-	WorkerName  string        `json:"worker_name"`
-	StartTime   time.Time     `json:"start_time"`
-	EndTime     time.Time     `json:"end_time"`
-	Duration    time.Duration `json:"duration"`
-	DurationSec float64       `json:"duration_sec"`
-	Error       string        `json:"error"`
+	JobID           int           `json:"job_id"`
+	WorkerName      string        `json:"worker_name"`
+	StartTime       time.Time     `json:"start_time"`
+	EndTime         time.Time     `json:"-"`
+	Duration        time.Duration `json:"-"`
+	DurationSeconds float64       `json:"duration_seconds"`
+	Error           string        `json:"-"`
 }
 
 type Job struct {
