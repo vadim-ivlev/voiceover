@@ -88,11 +88,11 @@ func StartPipeline(textLines []string) (doneJobs []Job, err error) {
 
 	// Create job channels
 	jobsChan := make(chan Job)
-	textChan := make(chan Job, 100)
-	soundChan := make(chan Job, 100)
+	textChan := make(chan Job, 500)
+	soundChan := make(chan Job, 500)
 
 	// go GenerateJobs(10, 0, jobsChan)
-	go toChannel(newJobsArray(23), jobsChan, 0)
+	go toChannel(newJobsArray(100), jobsChan, 0)
 	doTeamWork(1, "T", getTextOperation(textLines), jobsChan, textChan)
 	doTeamWork(4, "S", soundOperation, textChan, soundChan)
 
@@ -119,7 +119,7 @@ func ProcessFile(filePath string) (err error) {
 	if err != nil {
 		return err
 	}
-	log.Info().Msg(PrettyJSON(textLines))
+	// log.Info().Msg(PrettyJSON(textLines))
 
 	// process the jobs in the pipeline
 	processedJobs, err := StartPipeline(textLines)
@@ -140,7 +140,7 @@ func ProcessFile(filePath string) (err error) {
 
 	// log the processed jobs
 	log.Info().Msg("All jobs have been processed.<<<<<<<<<<<<<<<<<<<")
-	log.Info().Msg(PrettyJSON(processedJobs))
+	// log.Info().Msg(PrettyJSON(processedJobs))
 	return nil
 }
 

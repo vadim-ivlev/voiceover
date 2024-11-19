@@ -2,7 +2,7 @@
     "go.testFlags": [
     "-v",
     "-count=1",
-    // "-timeout=200s"
+    "-timeout=200s"
     ]
     ,
     // "gopls": { 

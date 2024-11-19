@@ -2,6 +2,8 @@ package pipe
 
 import (
 	"testing"
+
+	"github.com/vadim-ivlev/voiceover/internal/sound"
 )
 
 func TestProcessFile(t *testing.T) {
@@ -15,7 +17,7 @@ func TestProcessFile(t *testing.T) {
 	}{
 		{
 			name:    "Test StartFileProcessing",
-			args:    args{filePath: "./texts/The Mind.txt"},
+			args:    args{filePath: "./texts/The Mind is Flat ( PDFDrive ).txt"},
 			wantErr: false,
 		},
 	}
@@ -24,6 +26,7 @@ func TestProcessFile(t *testing.T) {
 			if err := ProcessFile(tt.args.filePath); (err != nil) != tt.wantErr {
 				t.Errorf("StartFileProcessing() error = %v, wantErr %v", err, tt.wantErr)
 			}
+			sound.PlayMP3(tt.args.filePath + ".mp3")
 		})
 	}
 }
