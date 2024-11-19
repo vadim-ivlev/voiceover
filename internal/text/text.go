@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+var splitString = "\n"
+
 // SplitTextFile splits a text file into an array of strings.
 func SplitTextFile(fileName string) ([]string, error) {
 	// read the text file
@@ -17,7 +19,7 @@ func SplitTextFile(fileName string) ([]string, error) {
 
 	text := string(bytes)
 	// split the text file with separator "\n\n"
-	lines := strings.Split(text, "\n\n")
+	lines := strings.Split(text, splitString)
 
 	return lines, nil
 }
@@ -50,8 +52,8 @@ func split(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		return 0, nil, nil
 	}
 
-	if i := bytes.Index(data, []byte("\n\n")); i >= 0 {
-		return i + 2, data[0:i], nil
+	if i := bytes.Index(data, []byte(splitString)); i >= 0 {
+		return i + len(splitString), data[0:i], nil
 	}
 
 	if atEOF {
@@ -59,4 +61,14 @@ func split(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	}
 
 	return 0, nil, nil
+}
+
+// SaveTextFile saves a text to a file.
+func SaveTextFile(fileName string, text string) error {
+	// write the text to the file
+	err := os.WriteFile(fileName, []byte(text), 0644)
+	if err != nil {
+		return err
+	}
+	return nil
 }

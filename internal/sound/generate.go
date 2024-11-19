@@ -42,7 +42,7 @@ func NextVoice() string {
 	return voices[currentVoice]
 }
 
-func GenerateMP3(speed float64, voice, text, fileName string) error {
+func GenerateSpeechMP3(speed float64, voice, text, fileName string) error {
 	url := config.Params.BaseURL + "/v1/audio/speech"
 	body := requestBody{
 		Model: "tts-1",
@@ -106,4 +106,19 @@ func GenerateSilenceMP3(fileName string, duration float64) error {
 	}
 
 	return nil
+}
+
+// GenerateMP3 - creates a mp3 file that contains silence or speech.
+// Parameters:
+// silenceDuration - the duration of the silence in seconds if text is empty.
+// speed - the speed of the speech.
+// voice - the voice to use for the speech.
+// text - the text to speak.
+// fileName - the name of the file to create.
+func GenerateMP3(silenceDuration, speed float64, voice, text, fileName string) (err error) {
+	if len(text) > 0 {
+		return GenerateSpeechMP3(1.0, voice, text, fileName)
+	} else {
+		return GenerateSilenceMP3(fileName, silenceDuration)
+	}
 }

@@ -29,7 +29,7 @@ func TestGenerateMP3(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := GenerateMP3(tt.args.speed, tt.args.voice, tt.args.text, tt.args.fileName); (err != nil) != tt.wantErr {
+			if err := GenerateSpeechMP3(tt.args.speed, tt.args.voice, tt.args.text, tt.args.fileName); (err != nil) != tt.wantErr {
 				t.Errorf("GenerateMP3() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			err := PlayMP3(tt.args.fileName)

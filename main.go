@@ -16,7 +16,7 @@ func main() {
 	text := "The quick brown fox jumped over the lazy dog."
 	fileName := "speech.mp3"
 
-	err := sound.GenerateMP3(speed, voice, text, fileName)
+	err := sound.GenerateSpeechMP3(speed, voice, text, fileName)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 	} else {
