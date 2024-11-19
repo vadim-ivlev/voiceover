@@ -12,10 +12,11 @@ import (
 
 // config - структура для хранения параметров приложения
 type config struct {
-	BaseURL   string `env:"BASE_URL" envDefault:"https://api.openai.com"`
-	ApiKey    string `env:"API_KEY"`
-	TextsDir  string `env:"TEXTS_DIR" envDefault:"./.data/texts"`
-	SoundsDir string `env:"SOUNDS_DIR" envDefault:"./.data/sounds"`
+	BaseURL          string `env:"BASE_URL" envDefault:"https://api.openai.com"`
+	ApiKey           string `env:"API_KEY"`
+	TextsDir         string `env:"TEXTS_DIR" envDefault:"./.data/texts"`
+	SoundsDir        string `env:"SOUNDS_DIR" envDefault:"./.data/sounds"`
+	FileListFileName string `env:"FILE_LIST_FILE_NAME" envDefault:"file-list.txt"`
 }
 
 func (c config) String() string {

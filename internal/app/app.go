@@ -24,11 +24,29 @@ func InitApp() {
 		config.Params.ApiKey = os.Getenv("OPENAI_API_KEY")
 	}
 
-	log.Info().Msg("Application started.")
-	// log.Info().Msg(config.Params.String())
+	RecreateDirs()
 
-	// Create directories for texts and sounds
-	err := os.MkdirAll(config.Params.TextsDir, 0755)
+	log.Info().Msg("Application started.")
+
+}
+
+// RecreateDirs - recreates directories for texts and sounds
+func RecreateDirs() {
+	err := os.RemoveAll(config.Params.FileListFileName)
+	if err != nil {
+		log.Warn().Msg(err.Error())
+	}
+	err = os.RemoveAll(config.Params.TextsDir)
+	if err != nil {
+		log.Warn().Msg(err.Error())
+	}
+	err = os.RemoveAll(config.Params.SoundsDir)
+	if err != nil {
+		log.Warn().Msg(err.Error())
+	}
+	//-----------------
+
+	err = os.MkdirAll(config.Params.TextsDir, 0755)
 	if err != nil {
 		log.Error().Msg(err.Error())
 	}

@@ -2,10 +2,12 @@ package pipe
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 
 	"github.com/rs/zerolog/log"
+	"github.com/vadim-ivlev/voiceover/internal/app"
 	"github.com/vadim-ivlev/voiceover/internal/config"
 	"github.com/vadim-ivlev/voiceover/internal/sound"
 	"github.com/vadim-ivlev/voiceover/internal/text"
@@ -100,6 +102,18 @@ func StartPipeline(textLines []string) (doneJobs []Job, err error) {
 }
 
 func ProcessFile(filePath string) (err error) {
+	// calculate file name for the output file
+	outputFileName := filePath + ".mp3"
+
+	//delete the output file if it exists
+	err = os.Remove(outputFileName)
+	if err != nil {
+		log.Info().Msgf("Failed to delete the output file: %v", err)
+	}
+
+	// clear directory of text and sound files
+	app.RecreateDirs()
+
 	// split the file
 	textLines, err := text.SplitTextFileScan(filePath)
 	if err != nil {
@@ -113,8 +127,38 @@ func ProcessFile(filePath string) (err error) {
 		return err
 	}
 
+	// create file list of audio files for concatenation
+	err = CreateFileList(processedJobs)
+	if err != nil {
+		return err
+	}
+
+	err = sound.ConcatenateMP3Files(config.Params.FileListFileName, outputFileName)
+	if err != nil {
+		return err
+	}
+
 	// log the processed jobs
 	log.Info().Msg("All jobs have been processed.<<<<<<<<<<<<<<<<<<<")
 	log.Info().Msg(PrettyJSON(processedJobs))
+	return nil
+}
+
+// CreateFileList - creates a file list of audio files for concatenation with ffmpeg
+// File list example:
+// file 'file1.mp3'
+// file 'file2.mp3'
+// file 'file3.mp3'
+// Parameters:
+// jobs: the jobs to process
+func CreateFileList(jobs []Job) (err error) {
+	fileList := ""
+	for _, job := range jobs {
+		fileList += fmt.Sprintf("file '%s'\n", job.AudioFile)
+	}
+	err = text.SaveTextFile(config.Params.FileListFileName, fileList)
+	if err != nil {
+		return err
+	}
 	return nil
 }

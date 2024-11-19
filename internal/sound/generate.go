@@ -93,7 +93,7 @@ func GenerateSpeechMP3(speed float64, voice, text, fileName string) error {
 // Parameters:
 // fileName - the name of the file to create.
 // duration - the duration of the silence in seconds.
-func GenerateSilenceMP3(fileName string, duration float64) error {
+func GenerateSilenceMP3(duration float64, fileName string) error {
 	// Construct the ffmpeg command
 	durationStr := fmt.Sprintf("%f", duration)
 	log.Info().Msgf("Duration: %s", durationStr)
@@ -117,8 +117,43 @@ func GenerateSilenceMP3(fileName string, duration float64) error {
 // fileName - the name of the file to create.
 func GenerateMP3(silenceDuration, speed float64, voice, text, fileName string) (err error) {
 	if len(text) > 0 {
-		return GenerateSpeechMP3(1.0, voice, text, fileName)
+		return GenerateSpeechMP3(speed, voice, text+".", fileName)
 	} else {
-		return GenerateSilenceMP3(fileName, silenceDuration)
+		return GenerateSilenceMP3(silenceDuration, fileName)
 	}
+}
+
+/*
+To combine MP3 files using FFmpeg, follow these steps:
+
+1. Create a text file listing the MP3 files to merge
+Create a text file, e.g., file_list.txt, with the following format:
+
+file 'file1.mp3'
+file 'file2.mp3'
+file 'file3.mp3'
+
+Each line should start with file followed by the file name enclosed in single quotes. Ensure the file paths are correct.
+
+2. Run the FFmpeg command
+Use the following command to merge the MP3 files:
+
+bash
+
+ffmpeg -f concat -safe 0 -i file_list.txt -c copy output.mp3
+*/
+
+// ConcatenateMP3Files - concatenates a list of mp3 files into a single mp3 file using ffmpeg.
+// Parameters:
+// fileListFileName - the name of the file that contains the list of mp3 files to concatenate.
+// outputFileName - the name of the output file.
+func ConcatenateMP3Files(fileListFileName, outputFileName string) error {
+	// cmd := exec.Command("ffmpeg", "-f", "concat", "-safe", "0", "-i", fileListFileName, "-c", "copy", outputFileName)
+	// ffmpeg -f concat -safe 0 -i filelist.txt -c:a libmp3lame -q:a 2 output.mp3 -y
+	cmd := exec.Command("ffmpeg", "-f", "concat", "-safe", "0", "-i", fileListFileName, "-c:a", "libmp3lame", "-q:a", "2", outputFileName, "-y")
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+	return nil
 }

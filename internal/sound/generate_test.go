@@ -59,7 +59,7 @@ func TestGenerateSilenceFileFfmpeg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := GenerateSilenceMP3(tt.args.fileName, tt.args.duration); (err != nil) != tt.wantErr {
+			if err := GenerateSilenceMP3(tt.args.duration, tt.args.fileName); (err != nil) != tt.wantErr {
 				t.Errorf("GenerateSilenceFileFfmpeg() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
