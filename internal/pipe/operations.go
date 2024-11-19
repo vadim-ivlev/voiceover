@@ -88,13 +88,13 @@ func StartPipeline(textLines []string) (doneJobs []Job, err error) {
 
 	// Create job channels
 	jobsChan := make(chan Job)
-	textChan := make(chan Job, 50)
-	soundChan := make(chan Job, 50)
+	textChan := make(chan Job, 100)
+	soundChan := make(chan Job, 100)
 
 	// go GenerateJobs(10, 0, jobsChan)
-	go toChannel(newJobsArray(10), jobsChan, 0)
+	go toChannel(newJobsArray(23), jobsChan, 0)
 	doTeamWork(1, "T", getTextOperation(textLines), jobsChan, textChan)
-	doTeamWork(1, "S", soundOperation, textChan, soundChan)
+	doTeamWork(4, "S", soundOperation, textChan, soundChan)
 
 	// gatther the jobs into an array
 	doneJobs = toArray(soundChan)
