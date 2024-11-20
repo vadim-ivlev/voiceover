@@ -2,6 +2,7 @@
 package app
 
 import (
+	"flag"
 	"os"
 
 	"github.com/rs/zerolog/log"
@@ -12,22 +13,8 @@ import (
 // InitApp - initializes the application
 func InitApp() {
 	logger.InitializeLogger()
-
-	// load environment variables from files
-	config.ReadConfig(".env")
-	config.ReadConfig("voiceover.env")
-	// Parse environment variables into the config.Params structure
-	config.ParseEnv()
-
-	// if the API key is not set in the config file, then we try to get it from the environment variable
-	if config.Params.ApiKey == "" {
-		config.Params.ApiKey = os.Getenv("OPENAI_API_KEY")
-	}
-
-	RecreateDirs()
-
-	log.Info().Msg("Application started.")
-
+	config.SetAppParams()
+	config.PrintAppParams()
 }
 
 // RecreateDirs - recreates directories for texts and sounds
@@ -54,4 +41,19 @@ func RecreateDirs() {
 	if err != nil {
 		log.Error().Msg(err.Error())
 	}
+}
+
+func ExitIfNoFileToProcess() {
+	if config.Params.InputFileName == "" {
+		log.Error().Msg("No Input File to process.")
+		flag.Usage()
+		os.Exit(1)
+	}
+
+	// // Check positional arguments
+	// if flag.NArg() == 0 {
+	// 	flag.Usage()
+	// 	os.Exit(1)
+	// }
+
 }
