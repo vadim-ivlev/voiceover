@@ -29,6 +29,7 @@ func LogJob(job Job, msg string) {
 
 // getTextJobOperation - returns the textJob operation
 func getTextOperation(textLines []string) JobFunction {
+	// adds text to the job, and assigns a voice
 	return func(job Job) Job {
 		if len(textLines) < job.ID+1 {
 			log.Error().Msgf("Job %d: No text for the job", job.ID)
@@ -78,51 +79,71 @@ func toArray(jobsChan chan Job) []Job {
 	return jobsArray
 }
 
-// StartPipeline - starts the pipeline processing.
+// DoPipeline - starts the pipeline processing.
 // Parameters:
 // textLines: the text lines to process
 // Returns:
 // an array of processed jobs
 // an error if any
-func StartPipeline(textLines []string) (doneJobs []Job, err error) {
+func DoPipeline(textLines []string) (doneJobs []Job, err error) {
 
-	// Create job channels
+	numLines := len(textLines)
+
+	// Create channels to pass the jobs between the workers
 	jobsChan := make(chan Job)
-	textChan := make(chan Job, 500)
-	soundChan := make(chan Job, 500)
+	textChan := make(chan Job)
+	// soundChan must be buffered because its jobs will be sorted after it is closed
+	soundChan := make(chan Job, numLines)
 
-	// go GenerateJobs(10, 0, jobsChan)
-	go toChannel(newJobsArray(100), jobsChan, 0)
-	doTeamWork(1, "T", getTextOperation(textLines), jobsChan, textChan)
+	// Fill the jobs channel with the jobs from a newly created array
+	go toChannel(newJobsArray(numLines), jobsChan, 0)
+	// add a text to each job and assign a voice
+	// doTeamWork(1, "T", getTextOperation(textLines), jobsChan, textChan)
+	go DoWork(nil, "T", getTextOperation(textLines), jobsChan, textChan)
+	// generate sound file for each job. Fan-out.
 	doTeamWork(4, "S", soundOperation, textChan, soundChan)
 
-	// gatther the jobs into an array
+	// gatther the jobs into an array. Fan-in.
 	doneJobs = toArray(soundChan)
 	return doneJobs, nil
 }
 
-func ProcessFile(filePath string) (err error) {
-	// calculate file name for the output file
-	outputFileName := filePath + ".mp3"
+// ProcessFile - processes the input file.
+func ProcessFile() (err error) {
 
-	//delete the output file if it exists
-	err = os.Remove(outputFileName)
+	// Get text lines from the input file
+	textLines, start, end, err := text.GetTextFileLines(config.Params.InputFileName, config.Params.Start, config.Params.End)
+	if err != nil {
+		return err
+	}
+
+	// Print extracted text lines
+	for i, line := range textLines {
+		log.Info().Msgf("%06d: %s", start+i, line)
+	}
+
+	// calculate file name for the output file
+	outputFileName := fmt.Sprintf("%s.lines-%06d-%06d", config.Params.OutputFileName, start, end)
+
+	//remove the output mp3 file if it exists
+	err = os.Remove(outputFileName + ".mp3")
+	if err != nil {
+		log.Info().Msgf("Failed to delete the output file: %v", err)
+	}
+
+	// remove the output text file if it exists
+	err = os.Remove(outputFileName + ".txt")
 	if err != nil {
 		log.Info().Msgf("Failed to delete the output file: %v", err)
 	}
 
 	// clear directory of text and sound files
-	app.RecreateDirs()
+	app.RemoveTempFiles()
 
-	// split the file
-	textLines, err := text.SplitTextFileScan(filePath)
-	if err != nil {
-		return err
-	}
-	// log.Info().Msg(PrettyJSON(textLines))
+	// return nil
 
-	// process the jobs in the pipeline
-	processedJobs, err := StartPipeline(textLines)
+	// process the jobs in the pipeline -----------------
+	processedJobs, err := DoPipeline(textLines)
 	if err != nil {
 		return err
 	}
@@ -134,14 +155,17 @@ func ProcessFile(filePath string) (err error) {
 	}
 
 	// concatenate the audio files into one
-	err = sound.ConcatenateMP3Files(config.Params.FileListFileName, outputFileName)
+	err = sound.ConcatenateMP3Files(config.Params.FileListFileName, outputFileName+".mp3")
 	if err != nil {
 		return err
 	}
 
-	// log the processed jobs
-	log.Info().Msg("All jobs have been processed.<<<<<<<<<<<<<<<<<<<")
-	// log.Info().Msg(PrettyJSON(processedJobs))
+	// write a text file with processed lines
+	err = text.SaveTextFile(outputFileName+".txt", strings.Join(textLines, "\n"))
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

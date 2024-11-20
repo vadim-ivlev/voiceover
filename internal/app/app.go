@@ -17,8 +17,8 @@ func InitApp() {
 	config.PrintAppParams()
 }
 
-// RecreateDirs - recreates directories for texts and sounds
-func RecreateDirs() {
+// RemoveTempFiles - recreates directories for texts and sounds
+func RemoveTempFiles() {
 	err := os.RemoveAll(config.Params.FileListFileName)
 	if err != nil {
 		log.Warn().Msg(err.Error())

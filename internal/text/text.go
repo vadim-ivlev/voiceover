@@ -3,6 +3,7 @@ package text
 import (
 	"bufio"
 	"bytes" // added
+	"fmt"
 	"os"
 	"strings"
 )
@@ -73,7 +74,7 @@ func SaveTextFile(fileName string, text string) error {
 	return nil
 }
 
-// SplitTextFileLines - splits a text file into an array of strings.
+// GetTextFileLines - splits a text file into an array of strings.
 // Parameters:
 // - fileName: the name of the file to split.
 // - startIndex: the index of the first line to include.
@@ -82,7 +83,7 @@ func SaveTextFile(fileName string, text string) error {
 // - lines: the array of strings. Can be empty.
 // - start: the actual index of the first line of the returned strings.
 // - end: the actual index of the last line of the returned strings.
-func SplitTextFileLines(fileName string, startIndex, endIndex int) (lines []string, start, end int, err error) {
+func GetTextFileLines(fileName string, startIndex, endIndex int) (lines []string, start, end int, err error) {
 	allLines, err := SplitTextFileScan(fileName)
 	if err != nil {
 		return nil, 0, 0, err
@@ -102,12 +103,12 @@ func SplitTextFileLines(fileName string, startIndex, endIndex int) (lines []stri
 		startIndex = 0
 	}
 	if startIndex >= totalLines {
-		return nil, startIndex, endIndex, nil
+		return nil, startIndex, endIndex, fmt.Errorf("start index %d is greater than or equal to the total number of lines %d", startIndex, totalLines)
 	}
 
 	// check if the start index is greater than the end index
 	if startIndex >= endIndex {
-		return nil, startIndex, endIndex, nil
+		return nil, startIndex, endIndex, fmt.Errorf("start index %d is greater than or equal to the end index %d", startIndex, endIndex)
 	}
 
 	// get the lines

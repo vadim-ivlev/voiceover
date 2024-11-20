@@ -50,13 +50,16 @@ func GenerateJobs(numJobs, napTime int, out chan Job) {
 
 // DoWork - executes the operation on the job and sends the job to the out channel.
 // Parameters:
-// wg: a wait group to wait for the workers to finish
+// wg: a wait group to wait for the workers to finish. Can be nil if the workers works alone, outside doTeamWork.
 // workerName: the name of the worker
 // operation: the operation to execute on the job
 // in: a channel to receive the jobs from
 // out: a channel to send the jobs to
 func DoWork(wg *sync.WaitGroup, workerName string, operation JobFunction, in <-chan Job, out chan<- Job) {
-	defer wg.Done()
+	// Decrease the wait group counter when the worker belongs to a team.
+	if wg != nil {
+		defer wg.Done()
+	}
 	for job := range in {
 		logRecord := ProcessLogRecord{
 			JobID:      job.ID,
@@ -74,7 +77,10 @@ func DoWork(wg *sync.WaitGroup, workerName string, operation JobFunction, in <-c
 		LogJob(job, "done by "+workerName)
 		out <- job
 	}
-	// close(out)
+	// Close channel if worker works alone.
+	if wg == nil {
+		close(out)
+	}
 }
 
 // doTeamWork - creates a team of workers to process the jobs.
