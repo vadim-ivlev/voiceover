@@ -133,6 +133,7 @@ func ProcessFile(filePath string) (err error) {
 		return err
 	}
 
+	// concatenate the audio files into one
 	err = sound.ConcatenateMP3Files(config.Params.FileListFileName, outputFileName)
 	if err != nil {
 		return err
