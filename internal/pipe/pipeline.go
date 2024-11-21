@@ -11,7 +11,7 @@ func newJobsArray(numJobs int) []Job {
 	jobs := make([]Job, numJobs)
 	for i := 0; i < numJobs; i++ {
 		jobs[i] = createJob(i)
-		LogJob(jobs[i], "created in array")
+		// LogJob(jobs[i], "created in array")
 	}
 	return jobs
 }
@@ -74,7 +74,7 @@ func DoWork(wg *sync.WaitGroup, workerName string, operation JobFunction, in <-c
 		logRecord.DurationSeconds = logRecord.Duration.Seconds()
 
 		job.ProcessLog = append(job.ProcessLog, logRecord)
-		LogJob(job, "done by "+workerName)
+		LogJob(job, fmt.Sprintf("done by %10s in %.3f seconds", workerName, logRecord.DurationSeconds))
 		out <- job
 	}
 	// Close channel if worker works alone.

@@ -96,8 +96,9 @@ func GenerateSpeechMP3(speed float64, voice, text, fileName string) error {
 func GenerateSilenceMP3(duration float64, fileName string) error {
 	// Construct the ffmpeg command
 	durationStr := fmt.Sprintf("%f", duration)
-	log.Info().Msgf("Duration: %s", durationStr)
-	cmd := exec.Command("ffmpeg", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=mono", "-t", durationStr, "-q:a", "9", "-acodec", "libmp3lame", fileName)
+	// log.Info().Msgf("Duration: %s", durationStr)
+	// cmd := exec.Command("ffmpeg", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=mono", "-t", durationStr, "-q:a", "9", "-acodec", "libmp3lame", fileName)
+	cmd := exec.Command("ffmpeg", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", durationStr, "-q:a", "9", "-acodec", "libmp3lame", fileName)
 
 	// Run the ffmpeg command
 	err := cmd.Run()
@@ -148,11 +149,16 @@ ffmpeg -f concat -safe 0 -i file_list.txt -c copy output.mp3
 // fileListFileName - the name of the file that contains the list of mp3 files to concatenate.
 // outputFileName - the name of the output file.
 func ConcatenateMP3Files(fileListFileName, outputFileName string) error {
-	// cmd := exec.Command("ffmpeg", "-f", "concat", "-safe", "0", "-i", fileListFileName, "-c", "copy", outputFileName)
-	// ffmpeg -f concat -safe 0 -i filelist.txt -c:a libmp3lame -q:a 2 output.mp3 -y
 	cmd := exec.Command("ffmpeg", "-f", "concat", "-safe", "0", "-i", fileListFileName, "-c:a", "libmp3lame", "-q:a", "2", outputFileName, "-y")
+
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
 	err := cmd.Run()
 	if err != nil {
+		log.Error().Msg("*****************************************************")
+		log.Printf("Failed to concatenate mp3 files: %v\nStderr: %s", err, stderr.String())
+		log.Error().Msg("*****************************************************")
 		return err
 	}
 	return nil

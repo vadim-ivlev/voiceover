@@ -6,4 +6,5 @@ filelist.txt
 file-list.txt 
 *.epub
 voiceover
+*.log.json
 

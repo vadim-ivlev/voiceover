@@ -43,6 +43,7 @@ func getTextOperation(textLines []string) JobFunction {
 	}
 }
 
+// soundOperation - generates a sound file and a text file for the job
 func soundOperation(job Job) Job {
 	job.TextFile = fmt.Sprintf("%s/%08d.txt", config.Params.TextsDir, job.ID)
 	job.AudioFile = fmt.Sprintf("%s/%08d.mp3", config.Params.SoundsDir, job.ID)
@@ -101,7 +102,7 @@ func DoPipeline(textLines []string) (doneJobs []Job, err error) {
 	// doTeamWork(1, "T", getTextOperation(textLines), jobsChan, textChan)
 	go DoWork(nil, "T", getTextOperation(textLines), jobsChan, textChan)
 	// generate sound file for each job. Fan-out.
-	doTeamWork(4, "S", soundOperation, textChan, soundChan)
+	doTeamWork(10, "S", soundOperation, textChan, soundChan)
 
 	// gatther the jobs into an array. Fan-in.
 	doneJobs = toArray(soundChan)
@@ -109,18 +110,18 @@ func DoPipeline(textLines []string) (doneJobs []Job, err error) {
 }
 
 // ProcessFile - processes the input file.
-func ProcessFile() (err error) {
+func ProcessFile() (outMP3File string, outTextFile string, err error) {
 
 	// Get text lines from the input file
 	textLines, start, end, err := text.GetTextFileLines(config.Params.InputFileName, config.Params.Start, config.Params.End)
 	if err != nil {
-		return err
+		return
 	}
 
-	// Print extracted text lines
-	for i, line := range textLines {
-		log.Info().Msgf("%06d: %s", start+i, line)
-	}
+	// // Print extracted text lines
+	// for i, line := range textLines {
+	// 	log.Info().Msgf("%06d: %s", start+i, line)
+	// }
 
 	// calculate file name for the output file
 	outputFileName := fmt.Sprintf("%s.lines-%06d-%06d", config.Params.OutputFileName, start, end)
@@ -142,31 +143,39 @@ func ProcessFile() (err error) {
 
 	// return nil
 
-	// process the jobs in the pipeline -----------------
+	// HERE: process the jobs in the pipeline -----------------
 	processedJobs, err := DoPipeline(textLines)
 	if err != nil {
-		return err
+		return
 	}
 
 	// create file list of audio files for concatenation
 	err = CreateFileList(processedJobs)
 	if err != nil {
-		return err
+		return
 	}
 
 	// concatenate the audio files into one
 	err = sound.ConcatenateMP3Files(config.Params.FileListFileName, outputFileName+".mp3")
 	if err != nil {
-		return err
+		return
 	}
+	outMP3File = outputFileName + ".mp3"
 
 	// write a text file with processed lines
 	err = text.SaveTextFile(outputFileName+".txt", strings.Join(textLines, "\n"))
 	if err != nil {
-		return err
+		return
+	}
+	outTextFile = outputFileName + ".txt"
+
+	// write log of processed jobs
+	err = text.SaveTextFile(outputFileName+".log.json", PrettyJSON(processedJobs))
+	if err != nil {
+		return
 	}
 
-	return nil
+	return
 }
 
 // CreateFileList - creates a file list of audio files for concatenation with ffmpeg

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/rs/zerolog/log"
 )
 
 var splitString = "\n"
@@ -65,10 +67,11 @@ func split(data []byte, atEOF bool) (advance int, token []byte, err error) {
 }
 
 // SaveTextFile saves a text to a file.
-func SaveTextFile(fileName string, text string) error {
+func SaveTextFile(fileName, text string) error {
 	// write the text to the file
 	err := os.WriteFile(fileName, []byte(text), 0644)
 	if err != nil {
+		log.Error().Msgf("Failed to save text file %s: %v", fileName, err)
 		return err
 	}
 	return nil

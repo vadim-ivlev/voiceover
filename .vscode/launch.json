@@ -4,13 +4,46 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
-            "name": "Launch Package",
+            "name": "Launch",
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${fileDirname}"
+            "program": "${workspaceFolder}/main.go",
+            "buildFlags": "-gcflags \"all=-N -l\"",
+            "args": [],
+            "env": {},
+            "showLog": true
+        },
+        {
+            // Prebuild command: go build -gcflags "all=-N -l" -o __debug_bin
+            "name": "Prebuild",
+            "type": "go",
+            "request": "launch",
+            "mode": "exec",
+            "program": "${workspaceFolder}/__debug_bin",
+            "args": [],
+            "env": {},
+            "showLog": true
+        },
+        {
+            // -s 90 -e 100 -v alloy,fable texts/dahl.txt
+            "name": "main.go",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/main.go",
+            "args": [
+                "-s",
+                "90",
+                "-e",
+                "100",
+                "-v",
+                "alloy",
+                "texts/dahl.txt"
+            ],
         }
-]
+
+
+    ]
 }
