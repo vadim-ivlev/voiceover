@@ -35,10 +35,10 @@ curl -X POST -H "Content-Type: application/json" \
   "audioEncoding": "LINEAR16"
 }
 }' "https://texttospeech.googleapis.com/v1/text:synthesize" \
-| jq -r .audioContent | base64 -d > out.mp3
+| jq -r .audioContent | base64 -d > google-speak.mp3
 
 
 # Play the audio file
-ffplay out.mp3 -autoexit -nodisp -loglevel info
+ffplay google-speak.mp3 -autoexit -nodisp -loglevel info
 
 

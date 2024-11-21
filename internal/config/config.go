@@ -21,11 +21,12 @@ type config struct {
 	SoundsDir        string `env:"SOUNDS_DIR" envDefault:"./.data/sounds"`
 	FileListFileName string `env:"FILE_LIST_FILE_NAME" envDefault:"file-list.txt"`
 	// command line
-	Start          int    `json:"-s: Start      "`
-	End            int    `json:"-e: End        "`
-	Voices         string `json:"-v: Voices     "`
-	OutputFileName string `json:"-o: Output File"`
-	InputFileName  string `json:"  : Input  File"`
+	Engine         string `json:"-engine: Engine     "`
+	Start          int    `json:"-s     : Start      "`
+	End            int    `json:"-e     : End        "`
+	Voices         string `json:"-v     : Voices     "`
+	OutputFileName string `json:"-o     : Output File"`
+	InputFileName  string `json:"       : Input  File"`
 }
 
 func (c config) String() string {
@@ -57,6 +58,7 @@ Example of usage:
 func ParseCommandLine() {
 	flag.Usage = customUsage
 
+	flag.StringVar(&Params.Engine, "engine", "openai", "Engine to use {openai|google|elevenlabs}.")
 	flag.IntVar(&Params.Start, "s", 0, "Number of the first line of the file to process. Starting from 0.")
 	flag.IntVar(&Params.End, "e", 0, "Number of the last line of the file to process. Last line will not be processed. 0 - process to the end of the file.")
 	flag.StringVar(&Params.Voices, "v", "alloy,echo", "Comma separated list of voices (alloy,echo,fable,onyx,nova,shimmer). No spaces.")

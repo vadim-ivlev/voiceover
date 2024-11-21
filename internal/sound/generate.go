@@ -2,11 +2,7 @@ package sound
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"os"
 	"os/exec"
 	"strings"
 
@@ -44,51 +40,18 @@ func NextVoice() string {
 	return voices[currentVoice]
 }
 
+// GenerateSpeechMP3 - creates a mp3 file that contains speech.
 func GenerateSpeechMP3(speed float64, voice, text, fileName string) error {
-	url := config.Params.BaseURL + "/v1/audio/speech"
-	body := requestBody{
-		Model: "tts-1",
-		Input: text,
-		Voice: voice,
-		Speed: speed,
+	switch config.Params.Engine {
+	case "openai":
+		return GenerateOpenaiSpeechMP3(speed, voice, text, fileName)
+	case "google":
+		return GenerateGoogleSpeechMP3(speed, voice, text, fileName)
+	case "elevenlabs":
+		return GenerateElevenlabsSpeechMP3(speed, voice, text, fileName)
+	default:
+		return fmt.Errorf("unsupported engine: %s", config.Params.Engine)
 	}
-
-	jsonBody, err := json.Marshal(body)
-	if err != nil {
-		return fmt.Errorf("failed to marshal JSON: %v", err)
-	}
-
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
-	if err != nil {
-		return fmt.Errorf("failed to create request: %v", err)
-	}
-
-	req.Header.Set("Authorization", "Bearer "+config.Params.ApiKey)
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to make request: %v", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unexpected status code: %v", resp.Status)
-	}
-
-	outFile, err := os.Create(fileName)
-	if err != nil {
-		return fmt.Errorf("failed to create file: %v", err)
-	}
-	defer outFile.Close()
-
-	_, err = io.Copy(outFile, resp.Body)
-	if err != nil {
-		return fmt.Errorf("failed to write to file: %v", err)
-	}
-
-	return nil
 }
 
 // GenerateSilenceMP3 - creates a  mp3 file that contains silence using ffmpeg.
