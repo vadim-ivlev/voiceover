@@ -23,7 +23,7 @@ func main() {
 		log.Info().Msgf("MP3 file: %s", mp3File)
 		log.Info().Msgf("Text file: %s", txtFile)
 	}
+	// Log duration of the operation
 	duration := time.Since(startTime)
-	log.Info().Msgf("Duration: %v", duration)
-
+	log.Info().Msgf("Operation completed. Duration: %v", duration)
 }
