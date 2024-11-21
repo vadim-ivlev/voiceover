@@ -59,7 +59,7 @@ func ParseCommandLine() {
 
 	flag.IntVar(&Params.Start, "s", 0, "Number of the first line of the file to process. Starting from 0.")
 	flag.IntVar(&Params.End, "e", 0, "Number of the last line of the file to process. Last line will not be processed. 0 - process to the end of the file.")
-	flag.StringVar(&Params.Voices, "v", "alloy,echo,fable,onyx,nova,shimmer", "List of voices to use separated by comma. No spaces. If empty, all voices will be used.")
+	flag.StringVar(&Params.Voices, "v", "alloy,echo", "Comma separated list of voices (alloy,echo,fable,onyx,nova,shimmer). No spaces.")
 
 	flag.StringVar(&Params.OutputFileName, "o", "", "Output file name. If empty, will be equal to the input file name.")
 	flag.Parse()

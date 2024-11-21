@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/rs/zerolog/log"
 	"github.com/vadim-ivlev/voiceover/internal/config"
@@ -34,11 +35,12 @@ var currentVoice = -1
 
 // Returns next voice in the circular list of voices.
 func NextVoice() string {
-	voices := []string{VoiceAlloy, VoiceEcho, VoiceFable, VoiceOnyx, VoiceNova, VoiceShimmer}
-	currentVoice++
-	if currentVoice >= len(voices) || currentVoice < 0 {
-		currentVoice = 0
+	// get voices from config
+	voices := strings.Split(config.Params.Voices, ",")
+	if len(voices) == 0 {
+		voices = []string{VoiceAlloy, VoiceEcho}
 	}
+	currentVoice = (currentVoice + 1) % len(voices)
 	return voices[currentVoice]
 }
 
