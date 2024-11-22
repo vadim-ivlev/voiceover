@@ -32,8 +32,8 @@ func TestGenerateMP3(t *testing.T) {
 			if err := GenerateSpeechMP3(tt.args.speed, tt.args.voice, tt.args.text, tt.args.fileName); (err != nil) != tt.wantErr {
 				t.Errorf("GenerateMP3() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			err := PlayMP3(tt.args.fileName)
-			t.Errorf("PlayMP3() error = %v", err)
+			// err := PlayMP3(tt.args.fileName)
+			// t.Errorf("PlayMP3() error = %v", err)
 		})
 	}
 }

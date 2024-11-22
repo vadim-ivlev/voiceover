@@ -11,10 +11,17 @@ import (
 	"github.com/vadim-ivlev/voiceover/internal/config"
 )
 
+type openaiRequestBody struct {
+	Model string  `json:"model"`
+	Input string  `json:"input"`
+	Voice string  `json:"voice"`
+	Speed float64 `json:"speed"`
+}
+
 // GenerateOpenaiSpeechMP3 generates an MP3 file with the given text using the OpenAI API.
 func GenerateOpenaiSpeechMP3(speed float64, voice, text, fileName string) error {
 	url := config.Params.BaseURL + "/v1/audio/speech"
-	body := requestBody{
+	body := openaiRequestBody{
 		Model: "tts-1",
 		Input: text,
 		Voice: voice,

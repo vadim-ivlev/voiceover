@@ -2,8 +2,6 @@ package pipe
 
 import (
 	"testing"
-
-	"github.com/vadim-ivlev/voiceover/internal/sound"
 )
 
 func TestProcessFile(t *testing.T) {
@@ -26,7 +24,7 @@ func TestProcessFile(t *testing.T) {
 			if _, _, err := ProcessFile(); (err != nil) != tt.wantErr {
 				t.Errorf("StartFileProcessing() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			sound.PlayMP3(tt.args.filePath + ".mp3")
+			// sound.PlayMP3(tt.args.filePath + ".mp3")
 		})
 	}
 }

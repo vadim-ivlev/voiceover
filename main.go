@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -10,6 +11,7 @@ import (
 
 func main() {
 	app.InitApp()
+	log.Info().Msgf("GCLOUD_PROJECT: %s", os.Getenv("GCLOUD_PROJECT"))
 	app.ExitIfNoFileToProcess()
 	app.RemoveTempFiles()
 	log.Info().Msg("Application started.")

@@ -40,6 +40,8 @@
                 "100",
                 "-v",
                 "alloy",
+                "-engine",
+                "google",
                 "texts/dahl.txt"
             ],
         }

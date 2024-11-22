@@ -38,6 +38,7 @@ curl -X POST -H "Content-Type: application/json" \
 | jq -r .audioContent | base64 -d > google-speak.mp3
 
 
+
 # Play the audio file
 ffplay google-speak.mp3 -autoexit -nodisp -loglevel info
 

@@ -43,3 +43,33 @@ The application will:
 
 The configuration can be customized through environment variables or command line flags defined in config.go
 
+```json
+{
+    "input":
+        {
+            "text":"The Boy Who Talked with Animals."
+        },
+        "voice":
+        {
+            "languageCode":"en-GB",
+            "name":"en-GB-Journey-D"
+        },
+        "audioConfig":
+        {
+            "audioEncoding":"MP3"
+        }
+    }
+
+{
+"input": {
+  "text": "‘What sort of things?’ I asked him."
+},
+"voice": {
+  "languageCode": "en-GB",
+  "name": "en-GB-Journey-D"
+},
+"audioConfig": {
+  "audioEncoding": "LINEAR16"
+}
+}    
+```
