@@ -15,13 +15,13 @@ import (
 // config - структура для хранения параметров приложения
 type config struct {
 	// env
-	GcloudProject     string `env:"GCLOUD_PROJECT"`
-	GcloudAccessToken string `env:"GCLOUD_ACCESS_TOKEN"`
-	BaseURL           string `env:"BASE_URL" envDefault:"https://api.openai.com"`
-	ApiKey            string `env:"API_KEY"`
-	TextsDir          string `env:"TEXTS_DIR" envDefault:"./.data/texts"`
-	SoundsDir         string `env:"SOUNDS_DIR" envDefault:"./.data/sounds"`
-	FileListFileName  string `env:"FILE_LIST_FILE_NAME" envDefault:"file-list.txt"`
+	// GcloudProject     string `env:"GCLOUD_PROJECT"`
+	// GcloudAccessToken string `env:"GCLOUD_ACCESS_TOKEN"`
+	BaseURL          string `env:"BASE_URL" envDefault:"https://api.openai.com"`
+	ApiKey           string `env:"API_KEY"`
+	TextsDir         string `env:"TEXTS_DIR" envDefault:"./.data/texts"`
+	SoundsDir        string `env:"SOUNDS_DIR" envDefault:"./.data/sounds"`
+	FileListFileName string `env:"FILE_LIST_FILE_NAME" envDefault:"file-list.txt"`
 	// command line
 	Engine         string `json:"-engine: Engine     "`
 	Start          int    `json:"-s     : Start      "`
