@@ -32,16 +32,16 @@ func GenerateGoogleSpeechMP3(speed float64, voice, text, fileName string) error 
 	_ = voice
 	voice = "en-GB-Journey-D" // en-GB-News-K // en-GB-Studio-B M // en-GB-Studio-C F
 
-	reqBody := googleTTSRequest{}
-	reqBody.Input.Text = text
-	reqBody.Voice.LanguageCode = "en-GB"
-	reqBody.Voice.Name = voice
-	reqBody.AudioConfig.AudioEncoding = "MP3" //LINEAR16 is for WAV, MP3 is for MP3
+	ttsReq := googleTTSRequest{}
+	ttsReq.Input.Text = text
+	ttsReq.Voice.LanguageCode = "en-GB"
+	ttsReq.Voice.Name = voice
+	ttsReq.AudioConfig.AudioEncoding = "MP3" //LINEAR16 is for WAV, MP3 is for MP3
 	if speed != 1.0 {
-		reqBody.AudioConfig.SpeakingRate = speed
+		ttsReq.AudioConfig.SpeakingRate = speed
 	}
 
-	jsonBody, err := json.Marshal(reqBody)
+	ttsReqJSON, err := json.Marshal(ttsReq)
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func GenerateGoogleSpeechMP3(speed float64, voice, text, fileName string) error 
 	// prettyJson, _ := json.MarshalIndent(reqBody, "", "  ")
 	// log.Info().Msgf("Request: %s", string(prettyJson))
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(ttsReqJSON))
 	if err != nil {
 		return err
 	}

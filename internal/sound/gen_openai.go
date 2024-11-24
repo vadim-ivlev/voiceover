@@ -11,7 +11,7 @@ import (
 	"github.com/vadim-ivlev/voiceover/internal/config"
 )
 
-type openaiRequestBody struct {
+type openaiTTSRequest struct {
 	Model string  `json:"model"`
 	Input string  `json:"input"`
 	Voice string  `json:"voice"`
@@ -21,19 +21,19 @@ type openaiRequestBody struct {
 // GenerateOpenaiSpeechMP3 generates an MP3 file with the given text using the OpenAI API.
 func GenerateOpenaiSpeechMP3(speed float64, voice, text, fileName string) error {
 	url := config.Params.BaseURL + "/v1/audio/speech"
-	body := openaiRequestBody{
+	ttsReq := openaiTTSRequest{
 		Model: "tts-1",
 		Input: text,
 		Voice: voice,
 		Speed: speed,
 	}
 
-	jsonBody, err := json.Marshal(body)
+	ttsReqJSON, err := json.Marshal(ttsReq)
 	if err != nil {
 		return fmt.Errorf("failed to marshal JSON: %v", err)
 	}
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(ttsReqJSON))
 	if err != nil {
 		return fmt.Errorf("failed to create request: %v", err)
 	}

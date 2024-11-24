@@ -47,26 +47,6 @@ func GenerateSpeechMP3(speed float64, voice, text, fileName string) error {
 	}
 }
 
-// GenerateSilenceMP3 - creates a  mp3 file that contains silence using ffmpeg.
-// Parameters:
-// fileName - the name of the file to create.
-// duration - the duration of the silence in seconds.
-func GenerateSilenceMP3(duration float64, fileName string) error {
-	// Construct the ffmpeg command
-	durationStr := fmt.Sprintf("%f", duration)
-	// log.Info().Msgf("Duration: %s", durationStr)
-	// cmd := exec.Command("ffmpeg", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=mono", "-t", durationStr, "-q:a", "9", "-acodec", "libmp3lame", fileName)
-	cmd := exec.Command("ffmpeg", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", durationStr, "-q:a", "9", "-acodec", "libmp3lame", fileName)
-
-	// Run the ffmpeg command
-	err := cmd.Run()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // GenerateMP3 - creates a mp3 file that contains silence or speech.
 // Parameters:
 // silenceDuration - the duration of the silence in seconds if text is empty.
