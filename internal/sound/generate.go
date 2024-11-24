@@ -54,6 +54,7 @@ func GenerateSpeechMP3(speed float64, voice, text, fileName string) error {
 // voice - the voice to use for the speech.
 // text - the text to speak.
 // fileName - the name of the file to create.
+// TODO: remove
 func GenerateMP3(silenceDuration, speed float64, voice, text, fileName string) (err error) {
 	if len(text) > 0 {
 		return GenerateSpeechMP3(speed, voice, text+".", fileName)
