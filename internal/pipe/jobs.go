@@ -10,8 +10,8 @@ import (
 )
 
 // JobFunction - function that processes a job.
-// It takes a job and returns a modified job.
-type JobFunction func(Job) Job
+// It takes a job and returns a modified job and a possible error.
+type JobFunction func(Job) (Job, error)
 
 type ProcessLogRecord struct {
 	JobID           int           `json:"job_id"`
@@ -30,12 +30,6 @@ type Job struct {
 	Text string `json:"text"`
 	// Voice
 	Voice string `json:"voice,omitempty"`
-	// Request time
-	RequestTime string `json:"request_time,omitempty"`
-	// Request duration
-	RequestDuration string `json:"request_duration,omitempty"`
-	// Request error
-	RequestError string `json:"request_error,omitempty"`
 	// Text file
 	TextFile string `json:"text_file,omitempty"`
 	// Audio file

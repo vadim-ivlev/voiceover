@@ -25,14 +25,6 @@ func Nap() {
 	time.Sleep(napDuration)
 }
 
-// createJob - create a job with the given id
-func createJob(id int) Job {
-	job := Job{
-		ID: id,
-	}
-	return job
-}
-
 // LogJob - logs the job information
 func LogJob(job Job, msg string) {
 	log.Info().Msgf("Job %d %s", job.ID, msg)
@@ -42,18 +34,17 @@ func LogJob(job Job, msg string) {
 // getTextJobOperation - returns the textJob operation
 func getTextOperation(textLines []string) JobFunction {
 	// adds text to the job, and assigns a voice
-	return func(job Job) Job {
+	return func(job Job) (Job, error) {
 		if len(textLines) < job.ID+1 {
-			log.Error().Msgf("Job %d: No text for the job", job.ID)
-			return job
+			return job, fmt.Errorf("Job %d: No text for the job", job.ID)
 		}
 		job.Text = strings.TrimSpace(textLines[job.ID])
-		return job
+		return job, nil
 	}
 }
 
 // soundOperation - generates a sound file and a text file for the job
-func soundOperation(job Job) Job {
+func soundOperation(job Job) (Job, error) {
 	job.TextFile = fmt.Sprintf("%s/%08d.txt", config.Params.TextsDir, job.ID)
 	job.AudioFile = fmt.Sprintf("%s/%08d.mp3", config.Params.SoundsDir, job.ID)
 
@@ -61,7 +52,9 @@ func soundOperation(job Job) Job {
 	if len(job.Text) > 0 {
 		job.Voice = sound.NextVoice()
 	}
+
 	var err error
+
 	// if voice is empty, generate silence
 	if job.Voice == "" {
 		err = sound.GenerateSilenceMP3(0.7, job.AudioFile)
@@ -69,17 +62,15 @@ func soundOperation(job Job) Job {
 		err = sound.GenerateSpeechMP3(1.0, job.Voice, job.Text, job.AudioFile)
 	}
 	if err != nil {
-		log.Error().Msgf("Job %d: Failed to generate sound file: %v", job.ID, err)
-		job.RequestError = err.Error()
+		return job, err
 	}
 
 	err = text.SaveTextFile(job.TextFile, job.Text)
 	if err != nil {
-		log.Error().Msgf("Job %d: Failed to save text file: %v", job.ID, err)
-		job.RequestError += "; " + err.Error()
+		return job, err
 	}
 
-	return job
+	return job, nil
 }
 
 // toArray - moves the jobs from the channel to an array

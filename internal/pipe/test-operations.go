@@ -5,15 +5,15 @@ import (
 )
 
 // square - square the number
-func square(job Job) Job {
+func square(job Job) (Job, error) {
 	Nap()
-	return job
+	return job, nil
 }
 
 // cube - cube the number
-func cube(job Job) Job {
+func cube(job Job) (Job, error) {
 	Nap()
-	return job
+	return job, nil
 }
 
 func StartTestPipeline() {

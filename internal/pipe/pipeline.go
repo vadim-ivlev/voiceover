@@ -10,8 +10,9 @@ import (
 func newJobsArray(numJobs int) []Job {
 	jobs := make([]Job, numJobs)
 	for i := 0; i < numJobs; i++ {
-		jobs[i] = createJob(i)
-		// LogJob(jobs[i], "created in array")
+		jobs[i] = Job{
+			ID: i,
+		}
 	}
 	return jobs
 }
@@ -55,8 +56,10 @@ func DoWork(wg *sync.WaitGroup, workerName string, operation JobFunction, in <-c
 			StartTime:  time.Now(),
 		}
 
-		job = operation(job)
-
+		job, err := operation(job)
+		if err != nil {
+			logRecord.Error = err.Error()
+		}
 		logRecord.EndTime = time.Now()
 		logRecord.Duration = logRecord.EndTime.Sub(logRecord.StartTime)
 		logRecord.DurationSeconds = logRecord.Duration.Seconds()
