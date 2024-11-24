@@ -48,9 +48,6 @@ func getTextOperation(textLines []string) JobFunction {
 			return job
 		}
 		job.Text = strings.TrimSpace(textLines[job.ID])
-		if len(job.Text) > 0 {
-			job.Voice = sound.NextVoice()
-		}
 		return job
 	}
 }
@@ -60,8 +57,17 @@ func soundOperation(job Job) Job {
 	job.TextFile = fmt.Sprintf("%s/%08d.txt", config.Params.TextsDir, job.ID)
 	job.AudioFile = fmt.Sprintf("%s/%08d.mp3", config.Params.SoundsDir, job.ID)
 
-	// TODO: select voice here
-	err := sound.GenerateMP3(0.7, 1.0, job.Voice, job.Text, job.AudioFile)
+	// select voice
+	if len(job.Text) > 0 {
+		job.Voice = sound.NextVoice()
+	}
+	var err error
+	// if voice is empty, generate silence
+	if job.Voice == "" {
+		err = sound.GenerateSilenceMP3(0.7, job.AudioFile)
+	} else {
+		err = sound.GenerateSpeechMP3(1.0, job.Voice, job.Text, job.AudioFile)
+	}
 	if err != nil {
 		log.Error().Msgf("Job %d: Failed to generate sound file: %v", job.ID, err)
 		job.RequestError = err.Error()

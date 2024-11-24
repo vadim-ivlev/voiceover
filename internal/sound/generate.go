@@ -27,7 +27,7 @@ func NextVoice() string {
 	// get voices from config
 	voices := strings.Split(config.Params.Voices, ",")
 	if len(voices) == 0 {
-		voices = []string{VoiceAlloy, VoiceEcho}
+		return ""
 	}
 	currentVoice = (currentVoice + 1) % len(voices)
 	return voices[currentVoice]
@@ -47,21 +47,21 @@ func GenerateSpeechMP3(speed float64, voice, text, fileName string) error {
 	}
 }
 
-// GenerateMP3 - creates a mp3 file that contains silence or speech.
-// Parameters:
-// silenceDuration - the duration of the silence in seconds if text is empty.
-// speed - the speed of the speech.
-// voice - the voice to use for the speech.
-// text - the text to speak.
-// fileName - the name of the file to create.
-// TODO: remove
-func GenerateMP3(silenceDuration, speed float64, voice, text, fileName string) (err error) {
-	if len(text) > 0 {
-		return GenerateSpeechMP3(speed, voice, text+".", fileName)
-	} else {
-		return GenerateSilenceMP3(silenceDuration, fileName)
-	}
-}
+// // GenerateMP3 - creates a mp3 file that contains silence or speech.
+// // Parameters:
+// // silenceDuration - the duration of the silence in seconds if text is empty.
+// // speed - the speed of the speech.
+// // voice - the voice to use for the speech.
+// // text - the text to speak.
+// // fileName - the name of the file to create.
+// // TODO: remove
+// func GenerateMP3(silenceDuration, speed float64, voice, text, fileName string) (err error) {
+// 	if len(text) > 0 {
+// 		return GenerateSpeechMP3(speed, voice, text+".", fileName)
+// 	} else {
+// 		return GenerateSilenceMP3(silenceDuration, fileName)
+// 	}
+// }
 
 /*
 To combine MP3 files using FFmpeg, follow these steps:
