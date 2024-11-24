@@ -13,19 +13,10 @@ import (
 // fileName - the name of the file to create.
 // duration - the duration of the silence in seconds.
 func GenerateSilenceMP3(duration float64, fileName string) error {
-	// Construct the ffmpeg command
-	durationStr := fmt.Sprintf("%f", duration)
-	// log.Info().Msgf("Duration: %s", durationStr)
-	// cmd := exec.Command("ffmpeg", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=mono", "-t", durationStr, "-q:a", "9", "-acodec", "libmp3lame", fileName)
-	cmd := exec.Command("ffmpeg", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", durationStr, "-q:a", "9", "-acodec", "libmp3lame", fileName)
-
-	// Run the ffmpeg command
+	t := fmt.Sprintf("%f", duration)
+	cmd := exec.Command("ffmpeg", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", t, "-q:a", "9", "-acodec", "libmp3lame", fileName)
 	err := cmd.Run()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func GenerateSilenceMP31(filename string, durationSeconds int) error {
