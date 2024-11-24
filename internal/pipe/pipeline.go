@@ -37,15 +37,7 @@ func toChannel(jobsArray []Job, jobsChan chan Job, napTime int) {
 // napTime: the time to sleep after creating a job
 // out: a channel to send the jobs to
 func GenerateJobs(numJobs, napTime int, out chan Job) {
-	for i := 0; i < numJobs; i++ {
-		job := createJob(i)
-		LogJob(job, "created")
-		out <- job
-		if napTime > 0 {
-			Nap(napTime)
-		}
-	}
-	close(out)
+	toChannel(newJobsArray(numJobs), out, napTime)
 }
 
 // DoWork - executes the operation on the job and sends the job to the out channel.

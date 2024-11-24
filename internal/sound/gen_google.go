@@ -30,7 +30,7 @@ type googleTTSResponse struct {
 func GenerateGoogleSpeechMP3(speed float64, voice, text, fileName string) error {
 	url := "https://texttospeech.googleapis.com/v1/text:synthesize"
 	_ = voice
-	voice = "en-GB-Journey-D"
+	voice = "en-GB-Journey-D" // en-GB-News-K // en-GB-Studio-B M // en-GB-Studio-C F
 
 	reqBody := googleTTSRequest{}
 	reqBody.Input.Text = text

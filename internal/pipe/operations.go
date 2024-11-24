@@ -5,13 +5,22 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/vadim-ivlev/voiceover/internal/app"
 	"github.com/vadim-ivlev/voiceover/internal/config"
 	"github.com/vadim-ivlev/voiceover/internal/sound"
 	"github.com/vadim-ivlev/voiceover/internal/text"
+	"golang.org/x/exp/rand"
 )
+
+// Nap - Sleep for a random duration between 0 and milliseconds
+func Nap(milliseconds int) {
+	// random duration between 0 and 1 second
+	sleepDuration := time.Duration(rand.Intn(milliseconds)) * time.Millisecond
+	time.Sleep(sleepDuration)
+}
 
 // createJob - create a job with the given id
 func createJob(id int) Job {
@@ -126,7 +135,8 @@ func ProcessFile() (outMP3File string, outTextFile string, err error) {
 	// calculate file name for the output file
 	outputFileName := fmt.Sprintf("%s.lines-%06d-%06d", config.Params.OutputFileName, start, end)
 
-	//remove the output mp3 file if it exists
+	// remove the output mp3 file if it exists
+	// TODO: move down
 	err = os.Remove(outputFileName + ".mp3")
 	if err != nil {
 		log.Info().Msgf("Failed to delete the output file: %v", err)
