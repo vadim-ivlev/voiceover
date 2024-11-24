@@ -20,13 +20,10 @@ func newJobsArray(numJobs int) []Job {
 // Parameters:
 // jobsArray: the array of jobs
 // jobsChan: the channel to send the jobs to
-// napTime: the time to sleep after sending a job
-func toChannel(jobsArray []Job, jobsChan chan Job, napTime int) {
+func toChannel(jobsArray []Job, jobsChan chan Job) {
 	for _, job := range jobsArray {
 		jobsChan <- job
-		if napTime > 0 {
-			Nap(napTime)
-		}
+		Nap()
 	}
 	close(jobsChan)
 }
@@ -34,10 +31,9 @@ func toChannel(jobsArray []Job, jobsChan chan Job, napTime int) {
 // GenerateJobs - Stage1. creates jobs and sends them to the out channel.
 // Parameters:
 // numJobs: the number of jobs to create
-// napTime: the time to sleep after creating a job
 // out: a channel to send the jobs to
 func GenerateJobs(numJobs, napTime int, out chan Job) {
-	toChannel(newJobsArray(numJobs), out, napTime)
+	toChannel(newJobsArray(numJobs), out)
 }
 
 // DoWork - executes the operation on the job and sends the job to the out channel.

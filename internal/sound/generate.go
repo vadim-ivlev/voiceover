@@ -35,7 +35,7 @@ func NextVoice() string {
 
 // GenerateSpeechMP3 - creates a mp3 file that contains speech.
 func GenerateSpeechMP3(speed float64, voice, text, fileName string) error {
-	switch config.Params.Engine {
+	switch config.Params.TTSAPI {
 	case "openai":
 		return GenerateOpenaiSpeechMP3(speed, voice, text, fileName)
 	case "google":
@@ -43,7 +43,7 @@ func GenerateSpeechMP3(speed float64, voice, text, fileName string) error {
 	case "elevenlabs":
 		return GenerateElevenlabsSpeechMP3(speed, voice, text, fileName)
 	default:
-		return fmt.Errorf("unsupported engine: %s", config.Params.Engine)
+		return fmt.Errorf("unsupported engine: %s", config.Params.TTSAPI)
 	}
 }
 

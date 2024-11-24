@@ -6,13 +6,13 @@ import (
 
 // square - square the number
 func square(job Job) Job {
-	Nap(2000)
+	Nap()
 	return job
 }
 
 // cube - cube the number
 func cube(job Job) Job {
-	Nap(100)
+	Nap()
 	return job
 }
 

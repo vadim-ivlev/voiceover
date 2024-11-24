@@ -24,14 +24,14 @@ type config struct {
 	SoundsDir        string `env:"SOUNDS_DIR" envDefault:"./.data/sounds"`
 	FileListFileName string `env:"FILE_LIST_FILE_NAME" envDefault:"file-list.txt"`
 	// command line
-	Engine         string `json:"-engine: Engine     "`
-	Start          int    `json:"-s     : Start      "`
-	End            int    `json:"-e     : End        "`
-	Voices         string `json:"-v     : Voices     "`
-	OutputFileName string `json:"-o     : Output File"`
-	InputFileName  string `json:"       : Input  File"`
+	TTSAPI         string `json:"-ttsapi   : TTS API {openai|google|elevenlabs} "`
+	Start          int    `json:"-s        : Start      "`
+	End            int    `json:"-e        : End        "`
+	Voices         string `json:"-voices   : Voices     "`
+	OutputFileName string `json:"-o        : Output File"`
+	InputFileName  string `json:"          : Input  File"`
 	// debug variables
-	NapTime int `json:"NapTime"`
+	NapTime int `json:"nap    : Nap Time   "`
 }
 
 func (c config) String() string {
@@ -63,10 +63,10 @@ Example of usage:
 func ParseCommandLine() {
 	flag.Usage = customUsage
 
-	flag.StringVar(&Params.Engine, "engine", "openai", "Engine to use {openai|google|elevenlabs}.")
+	flag.StringVar(&Params.TTSAPI, "ttsapi", "openai", "TTS API to use {openai|google|elevenlabs}.")
 	flag.IntVar(&Params.Start, "s", 0, "Number of the first line of the file to process. Starting from 0.")
 	flag.IntVar(&Params.End, "e", 0, "Number of the last line of the file to process. Last line will not be processed. 0 - process to the end of the file.")
-	flag.StringVar(&Params.Voices, "v", "alloy,echo", "Comma separated list of voices (alloy,echo,fable,onyx,nova,shimmer). No spaces.")
+	flag.StringVar(&Params.Voices, "voices", "", "Comma separated list of voices (alloy,echo,fable,onyx,nova,shimmer). No spaces.")
 	flag.StringVar(&Params.OutputFileName, "o", "", "Output file name. If empty, will be equal to the input file name.")
 	flag.IntVar(&Params.NapTime, "nap", 0, "Random nap time up to the given value in milliseconds between worker operations")
 	flag.Parse()

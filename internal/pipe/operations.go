@@ -15,11 +15,14 @@ import (
 	"golang.org/x/exp/rand"
 )
 
-// Nap - Sleep for a random duration between 0 and milliseconds
-func Nap(milliseconds int) {
-	// random duration between 0 and 1 second
-	sleepDuration := time.Duration(rand.Intn(milliseconds)) * time.Millisecond
-	time.Sleep(sleepDuration)
+// Nap - Sleep for a random duration between 0 and NapTime milliseconds
+func Nap() {
+	if config.Params.NapTime == 0 {
+		return
+	}
+	// random duration between 0 and NapTime milliseconds
+	napDuration := time.Duration(rand.Intn(config.Params.NapTime)) * time.Millisecond
+	time.Sleep(napDuration)
 }
 
 // createJob - create a job with the given id
@@ -107,7 +110,7 @@ func DoPipeline(textLines []string) (doneJobs []Job, err error) {
 	soundChan := make(chan Job, numLines)
 
 	// Fill the jobs channel with the jobs from a newly created array
-	go toChannel(newJobsArray(numLines), jobsChan, 0)
+	go toChannel(newJobsArray(numLines), jobsChan)
 	// add a text to each job and assign a voice
 	// doTeamWork(1, "T", getTextOperation(textLines), jobsChan, textChan)
 	go DoWork(nil, "T", getTextOperation(textLines), jobsChan, textChan)
