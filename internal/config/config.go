@@ -30,6 +30,8 @@ type Config struct {
 	Voices           string `json:"voices"`
 	OutputFileName   string `json:"output_file_name"`
 	InputFileName    string `json:"input_file_name"`
+	TaskFile         string `json:"task_file"`
+
 	// debug variables
 	NapTime int `json:"nap_time"`
 }
@@ -72,6 +74,8 @@ func ParseCommandLine() {
 	flag.IntVar(&Params.End, "e", 0, "Number of the last line of the file to process. Last line will not be processed. 0 - process to the end of the file.")
 	flag.StringVar(&Params.Voices, "voices", "", "Comma separated list of voices (alloy,echo,fable,onyx,nova,shimmer). No spaces.")
 	flag.StringVar(&Params.OutputFileName, "o", "", "Output file name. If empty, will be equal to the input file name.")
+	flag.StringVar(&Params.TaskFile, "taskfile", "", "Previous task file to continue processing.")
+
 	flag.IntVar(&Params.NapTime, "nap", 0, "Random nap time up to the given value in milliseconds between worker operations")
 	flag.Parse()
 
@@ -88,8 +92,8 @@ func ParseEnv() {
 	}
 }
 
-// ReadConfig reads env file and fill EnvParams with environment variables values
-func ReadConfig(fileName string) {
+// ReadEnvFile reads env file and fill EnvParams with environment variables values
+func ReadEnvFile(fileName string) {
 	if err := godotenv.Load(fileName); err != nil {
 		log.Warn().Msg(err.Error())
 	}
@@ -107,8 +111,8 @@ func JSONString(params interface{}) string {
 // SetAppParams - устанавливает параметры приложения
 func SetAppParams() {
 	// load environment variables from files
-	ReadConfig(".env")
-	ReadConfig("voiceover.env")
+	ReadEnvFile(".env")
+	ReadEnvFile("voiceover.env")
 	// Parse environment variables into the Params structure
 	ParseEnv()
 
@@ -119,6 +123,7 @@ func SetAppParams() {
 
 	// Parse command line arguments
 	ParseCommandLine()
+
 }
 
 // PrintAppParams - выводит параметры приложения

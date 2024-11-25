@@ -1,7 +1,9 @@
 package pipe
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 	"time"
@@ -148,4 +150,20 @@ func JoinMP3Files(processedJobs []Job, outputBaseName string) (outMP3File string
 	outMP3File = outputBaseName + ".mp3"
 	err = sound.ConcatenateMP3Files(config.Params.FileListFileName, outMP3File)
 	return
+}
+
+// LoadJSONFile - loads a JSON file into a structure
+// Parameters:
+// fileName: the name of the file
+// v: the structure to load the file into
+func LoadJSONFile(fileName string, v any) (err error) {
+	bytes, err := os.ReadFile(fileName)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(bytes, v)
+	if err != nil {
+		return
+	}
+	return nil
 }

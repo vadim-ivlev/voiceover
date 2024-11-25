@@ -19,11 +19,21 @@ func ProcessFile() (outMP3File, outTextFile, outTaskFile string, err error) {
 
 	startTime := time.Now()
 
-	task := Task{
-		Command:   strings.Join(os.Args, " "),
-		Params:    config.Params,
-		StartTime: startTime,
+	var task = Task{
+		Params: config.Params,
 	}
+
+	// check if we should continue a previous task
+	if config.Params.TaskFile != "" {
+		err = LoadJSONFile(config.Params.TaskFile, pPreviousTask)
+		if err != nil {
+			return
+		}
+		task = *pPreviousTask
+	}
+
+	task.StartTime = startTime
+	task.Command = strings.Join(os.Args, " ")
 
 	// Get text lines from the input file
 	textLines, start, end, err := text.GetTextFileLines(config.Params.InputFileName, config.Params.Start, config.Params.End)

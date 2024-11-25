@@ -16,6 +16,17 @@ func newJobsArray(numJobs int) []Job {
 			ID: i,
 		}
 	}
+
+	// load previous jobs
+	if pPreviousTask != nil && len(pPreviousTask.Jobs) > 0 {
+		for _, job := range pPreviousTask.Jobs {
+			i := job.ID
+			if i < numJobs {
+				jobs[i] = job
+			}
+		}
+	}
+
 	return jobs
 }
 

@@ -49,11 +49,4 @@ func ExitIfNoFileToProcess() {
 		flag.Usage()
 		os.Exit(1)
 	}
-
-	// // Check positional arguments
-	// if flag.NArg() == 0 {
-	// 	flag.Usage()
-	// 	os.Exit(1)
-	// }
-
 }

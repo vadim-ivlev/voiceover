@@ -28,6 +28,8 @@ type Task struct {
 	TaskErrors []string `json:"task_errors"`
 }
 
+var pPreviousTask *Task
+
 type ProcessLogRecord struct {
 	JobID           int           `json:"job_id"`
 	Work            string        `json:"work"`
