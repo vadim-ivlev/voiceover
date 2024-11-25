@@ -15,23 +15,23 @@ import (
 // config - структура для хранения параметров приложения
 type config struct {
 	// env
-	// GcloudProject     string `env:"GCLOUD_PROJECT"`
-	// GcloudAccessToken string `env:"GCLOUD_ACCESS_TOKEN"`
-	BaseURL string `env:"BASE_URL" envDefault:"https://api.openai.com"`
-	ApiKey  string `env:"API_KEY"`
+	GcloudProject     string `json:"gcloud_project" env:"GCLOUD_PROJECT"`
+	GcloudAccessToken string `json:"gcloud_access_token" env:"GCLOUD_ACCESS_TOKEN"`
+	OpenaiAPIURL      string `json:"openai_api_url" env:"OPENAI_API_URL" envDefault:"https://api.openai.com"`
+	ApiKey            string `json:"api_key" env:"API_KEY"`
 
-	TextsDir         string `env:"TEXTS_DIR" envDefault:"./.data/texts"`
-	SoundsDir        string `env:"SOUNDS_DIR" envDefault:"./.data/sounds"`
-	FileListFileName string `env:"FILE_LIST_FILE_NAME" envDefault:"file-list.txt"`
 	// command line
-	TTSAPI         string `json:"-ttsapi   : TTS API {openai|google|elevenlabs} "`
-	Start          int    `json:"-s        : Start      "`
-	End            int    `json:"-e        : End        "`
-	Voices         string `json:"-voices   : Voices     "`
-	OutputFileName string `json:"-o        : Output File"`
-	InputFileName  string `json:"          : Input  File"`
+	TextsDir         string `json:"texts_dir"`
+	SoundsDir        string `json:"sounds_dir"`
+	FileListFileName string `json:"file_list_file_name"`
+	TTSAPI           string `json:"tts_api"`
+	Start            int    `json:"start"`
+	End              int    `json:"end"`
+	Voices           string `json:"voices"`
+	OutputFileName   string `json:"output_file_name"`
+	InputFileName    string `json:"input_file_name"`
 	// debug variables
-	NapTime int `json:"nap    : Nap Time   "`
+	NapTime int `json:"nap_time"`
 }
 
 func (c config) String() string {
@@ -62,6 +62,10 @@ Example of usage:
 // ParseCommandLine - читает параметры командной строки с значениями по умолчанию
 func ParseCommandLine() {
 	flag.Usage = customUsage
+
+	flag.StringVar(&Params.TextsDir, "textsdir", "./.data/texts", "Directory with text files.")
+	flag.StringVar(&Params.SoundsDir, "soundsdir", "./.data/sounds", "Directory with sound files.")
+	flag.StringVar(&Params.FileListFileName, "filelist", "file-list.txt", "File with a list of MP3  files to concatenate.")
 
 	flag.StringVar(&Params.TTSAPI, "ttsapi", "openai", "TTS API to use {openai|google|elevenlabs}.")
 	flag.IntVar(&Params.Start, "s", 0, "Number of the first line of the file to process. Starting from 0.")

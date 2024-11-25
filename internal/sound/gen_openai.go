@@ -20,7 +20,7 @@ type openaiTTSRequest struct {
 
 // GenerateOpenaiSpeechMP3 generates an MP3 file with the given text using the OpenAI API.
 func GenerateOpenaiSpeechMP3(speed float64, voice, text, fileName string) error {
-	url := config.Params.BaseURL + "/v1/audio/speech"
+	url := config.Params.OpenaiAPIURL + "/v1/audio/speech"
 	ttsReq := openaiTTSRequest{
 		Model: "tts-1",
 		Input: text,

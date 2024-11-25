@@ -37,7 +37,7 @@ Environment variables can be defined in OS, voiceover.env, .env files listed in 
 
 ```bash
   # OpenAI or FreeAI API
-  BASE_URL="url for OpenAI API or FreeAI"
+  OPENAI_API_URL="url for OpenAI API or FreeAI"
   API_KEY="API key for OpenAI or FreeAI"
 
   #
