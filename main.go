@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/vadim-ivlev/voiceover/internal/app"
 	"github.com/vadim-ivlev/voiceover/internal/pipe"
+	"github.com/vadim-ivlev/voiceover/internal/stopper"
 )
 
 func main() {
@@ -15,6 +16,9 @@ func main() {
 	app.ExitIfNoFileToProcess()
 	app.RemoveTempFiles()
 	log.Info().Msg("Application started.")
+
+	// Start watching for the cancel signal
+	go stopper.WaitForCancel()
 
 	startTime := time.Now()
 	mp3File, txtFile, lofFile, err := pipe.ProcessFile()

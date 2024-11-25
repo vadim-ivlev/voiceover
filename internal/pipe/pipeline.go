@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/vadim-ivlev/voiceover/internal/stopper"
 )
 
 // newJobsArray - creates an array of jobs.
@@ -45,6 +47,11 @@ func DoWork(wg *sync.WaitGroup, work, workerName string, operation JobFunction, 
 	}
 	// for job := range in {
 	for {
+		// check if the program should stop
+		if stopper.Stop() {
+			break
+		}
+
 		job, ok := <-in
 		// If the channel is closed, break the loop
 		if !ok {

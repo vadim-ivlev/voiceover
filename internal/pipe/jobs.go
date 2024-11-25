@@ -39,6 +39,11 @@ type Job struct {
 	ProcessLog []ProcessLogRecord `json:"process_log"`
 }
 
+// String - String representation of the job
+func (j *Job) String() string {
+	return PrettyJSON(j)
+}
+
 func CompactJSON(data interface{}) string {
 	bytes, err := json.Marshal(data)
 	if err != nil {
@@ -53,9 +58,4 @@ func PrettyJSON(data interface{}) string {
 		log.Error().Msg(err.Error())
 	}
 	return string(bytes)
-}
-
-// String - String representation of the job
-func (j *Job) String() string {
-	return PrettyJSON(j)
 }
