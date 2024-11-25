@@ -75,13 +75,13 @@ func DoWork(wg *sync.WaitGroup, work, workerName string, operation JobFunction, 
 			continue
 		}
 
-		logRecord := ProcessLogRecord{
+		logRecord := WorkLogRecord{
 			JobID:     job.ID,
 			Work:      work,
 			Worker:    workerName,
 			StartTime: time.Now(),
 		}
-		job.ProcessLog = append(job.ProcessLog, logRecord)
+		job.WorksLog = append(job.WorksLog, logRecord)
 
 		Nap()
 		job, err := operation(job)
@@ -127,12 +127,12 @@ func doTeamWork(workersNumber int, work, workerNamePrefix string, operation JobF
 // or if the previous worker has failed.
 func ShouldSkipWork(job Job, work, workerName string) bool {
 	// If no process log, the work should not be skipped
-	if job.ProcessLog == nil || len(job.ProcessLog) == 0 {
+	if job.WorksLog == nil || len(job.WorksLog) == 0 {
 		return false
 	}
 
 	// check if this work has already been done
-	for _, logRecord := range job.ProcessLog {
+	for _, logRecord := range job.WorksLog {
 		if logRecord.Work == work {
 			LogJob(job, fmt.Sprintf("Work %s skipped by %s because it has already been done", work, workerName))
 			return true
@@ -140,7 +140,7 @@ func ShouldSkipWork(job Job, work, workerName string) bool {
 	}
 
 	// check if the previous worker has finished the job successfully
-	lastLog := job.ProcessLog[len(job.ProcessLog)-1]
+	lastLog := job.WorksLog[len(job.WorksLog)-1]
 	if lastLog.Error != "" {
 		LogJob(job, fmt.Sprintf("Work %s skipped by %s because the previous worker has failed", work, workerName))
 		return true

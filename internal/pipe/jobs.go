@@ -30,7 +30,7 @@ type Task struct {
 
 var pPreviousTask *Task
 
-type ProcessLogRecord struct {
+type WorkLogRecord struct {
 	JobID           int           `json:"job_id"`
 	Work            string        `json:"work"`
 	Worker          string        `json:"worker"`
@@ -55,8 +55,8 @@ type Job struct {
 		// Audio file
 		AudioFile string `json:"audio_file"`
 	} `json:"results"`
-	// Process Log. Records of the processing steps for the job
-	ProcessLog []ProcessLogRecord `json:"process_log"`
+	// Workers Log. Records of the processing steps for the job
+	WorksLog []WorkLogRecord `json:"works_log"`
 }
 
 // String - String representation of the job
