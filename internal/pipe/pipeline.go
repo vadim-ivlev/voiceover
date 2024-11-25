@@ -30,6 +30,7 @@ func toChannel(jobsArray []Job, jobsChan chan Job) {
 }
 
 // DoWork - executes the operation on the job and sends the job to the out channel.
+// It also logs the processing time and errors of the operation.
 // Parameters:
 // wg: a wait group to wait for the workers to finish. Can be nil if the workers works alone, outside doTeamWork.
 // work: the name of the work
@@ -96,6 +97,8 @@ func doTeamWork(workersNumber int, work, workerNamePrefix string, operation JobF
 }
 
 // ShouldSkipWork - checks if the work should be skipped.
+// It checks the process log of the job to see if the work has already been done
+// or if the previous worker has failed.
 func ShouldSkipWork(job Job, work, workerName string) bool {
 	// If no process log, the work should not be skipped
 	if job.ProcessLog == nil || len(job.ProcessLog) == 0 {
