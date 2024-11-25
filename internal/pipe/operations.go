@@ -110,9 +110,9 @@ func DoPipeline(textLines []string) (doneJobs []Job, err error) {
 	go toChannel(newJobsArray(numLines), jobsChan)
 	// add a text to each job and assign a voice
 	// doTeamWork(1, "T", getTextOperation(textLines), jobsChan, textChan)
-	go DoWork(nil, "T", getTextOperation(textLines), jobsChan, textChan)
+	go DoWork(nil, "Text", "T", getTextOperation(textLines), jobsChan, textChan)
 	// generate sound file for each job. Fan-out.
-	doTeamWork(10, "S", soundOperation, textChan, soundChan)
+	doTeamWork(10, "Sound", "S", soundOperation, textChan, soundChan)
 
 	// gatther the jobs into an array. Fan-in.
 	doneJobs = toArray(soundChan)
@@ -120,7 +120,7 @@ func DoPipeline(textLines []string) (doneJobs []Job, err error) {
 }
 
 // ProcessFile - processes the input file.
-func ProcessFile() (outMP3File string, outTextFile string, err error) {
+func ProcessFile() (outMP3File, outTextFile, outLogFile string, err error) {
 
 	// Get text lines from the input file
 	textLines, start, end, err := text.GetTextFileLines(config.Params.InputFileName, config.Params.Start, config.Params.End)
@@ -167,21 +167,22 @@ func ProcessFile() (outMP3File string, outTextFile string, err error) {
 	}
 
 	// concatenate the audio files into one
-	err = sound.ConcatenateMP3Files(config.Params.FileListFileName, outputFileName+".mp3")
+	outMP3File = outputFileName + ".mp3"
+	err = sound.ConcatenateMP3Files(config.Params.FileListFileName, outMP3File)
 	if err != nil {
 		return
 	}
-	outMP3File = outputFileName + ".mp3"
 
 	// write a text file with processed lines
-	err = text.SaveTextFile(outputFileName+".txt", strings.Join(textLines, "\n"))
+	outTextFile = outputFileName + ".txt"
+	err = text.SaveTextFile(outTextFile, strings.Join(textLines, "\n"))
 	if err != nil {
 		return
 	}
-	outTextFile = outputFileName + ".txt"
 
 	// write log of processed jobs
-	err = text.SaveTextFile(outputFileName+".log.json", PrettyJSON(processedJobs))
+	outLogFile = outputFileName + ".log.json"
+	err = text.SaveTextFile(outLogFile, PrettyJSON(processedJobs))
 	if err != nil {
 		return
 	}

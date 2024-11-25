@@ -21,7 +21,7 @@ func TestProcessFile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if _, _, err := ProcessFile(); (err != nil) != tt.wantErr {
+			if _, _, _, err := ProcessFile(); (err != nil) != tt.wantErr {
 				t.Errorf("StartFileProcessing() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			// sound.PlayMP3(tt.args.filePath + ".mp3")

@@ -15,12 +15,13 @@ type JobFunction func(Job) (Job, error)
 
 type ProcessLogRecord struct {
 	JobID           int           `json:"job_id"`
-	WorkerName      string        `json:"worker_name"`
+	Work            string        `json:"work"`
+	Worker          string        `json:"worker"`
 	StartTime       time.Time     `json:"start_time"`
-	EndTime         time.Time     `json:"-"`
+	EndTime         time.Time     `json:"end_time"`
 	Duration        time.Duration `json:"-"`
 	DurationSeconds float64       `json:"duration_seconds"`
-	Error           string        `json:"-"`
+	Error           string        `json:"error"`
 }
 
 type Job struct {
@@ -29,13 +30,13 @@ type Job struct {
 	// Text to process
 	Text string `json:"text"`
 	// Voice
-	Voice string `json:"voice,omitempty"`
+	Voice string `json:"voice"`
 	// Text file
-	TextFile string `json:"text_file,omitempty"`
+	TextFile string `json:"text_file"`
 	// Audio file
-	AudioFile string `json:"audio_file,omitempty"`
+	AudioFile string `json:"audio_file"`
 	// Process Log. Records of the processing steps for the job
-	ProcessLog []ProcessLogRecord `json:"process_log,omitempty"`
+	ProcessLog []ProcessLogRecord `json:"process_log"`
 }
 
 func CompactJSON(data interface{}) string {
