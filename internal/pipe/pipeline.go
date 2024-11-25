@@ -43,7 +43,14 @@ func DoWork(wg *sync.WaitGroup, work, workerName string, operation JobFunction, 
 	if wg != nil {
 		defer wg.Done()
 	}
-	for job := range in {
+	// for job := range in {
+	for {
+		job, ok := <-in
+		// If the channel is closed, break the loop
+		if !ok {
+			break
+		}
+
 		// Check if work needs to be done
 		if ShouldSkipWork(job, work, workerName) {
 			out <- job
