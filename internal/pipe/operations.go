@@ -2,13 +2,11 @@ package pipe
 
 import (
 	"fmt"
-	"os"
 	"sort"
 	"strings"
 	"time"
 
 	"github.com/rs/zerolog/log"
-	"github.com/vadim-ivlev/voiceover/internal/app"
 	"github.com/vadim-ivlev/voiceover/internal/config"
 	"github.com/vadim-ivlev/voiceover/internal/sound"
 	"github.com/vadim-ivlev/voiceover/internal/text"
@@ -38,34 +36,34 @@ func getTextOperation(textLines []string) JobFunction {
 		if len(textLines) < job.ID+1 {
 			return job, fmt.Errorf("Job %d: No text for the job", job.ID)
 		}
-		job.Text = strings.TrimSpace(textLines[job.ID])
+		job.Results.Text = strings.TrimSpace(textLines[job.ID])
 		return job, nil
 	}
 }
 
 // soundOperation - generates a sound file and a text file for the job
 func soundOperation(job Job) (Job, error) {
-	job.TextFile = fmt.Sprintf("%s/%08d.txt", config.Params.TextsDir, job.ID)
-	job.AudioFile = fmt.Sprintf("%s/%08d.mp3", config.Params.SoundsDir, job.ID)
+	job.Results.TextFile = fmt.Sprintf("%s/%08d.txt", config.Params.TextsDir, job.ID)
+	job.Results.AudioFile = fmt.Sprintf("%s/%08d.mp3", config.Params.SoundsDir, job.ID)
 
 	// select voice
-	if len(job.Text) > 0 {
-		job.Voice = sound.NextVoice()
+	if len(job.Results.Text) > 0 {
+		job.Results.Voice = sound.NextVoice()
 	}
 
 	var err error
 
 	// if voice is empty, generate silence
-	if job.Voice == "" {
-		err = sound.GenerateSilenceMP3(0.7, job.AudioFile)
+	if job.Results.Voice == "" {
+		err = sound.GenerateSilenceMP3(0.7, job.Results.AudioFile)
 	} else {
-		err = sound.GenerateSpeechMP3(1.0, job.Voice, job.Text, job.AudioFile)
+		err = sound.GenerateSpeechMP3(1.0, job.Results.Voice, job.Results.Text, job.Results.AudioFile)
 	}
 	if err != nil {
 		return job, err
 	}
 
-	err = text.SaveTextFile(job.TextFile, job.Text)
+	err = text.SaveTextFile(job.Results.TextFile, job.Results.Text)
 	if err != nil {
 		return job, err
 	}
@@ -119,77 +117,6 @@ func DoPipeline(textLines []string) (doneJobs []Job, err error) {
 	return doneJobs, nil
 }
 
-// ProcessFile - processes the input file.
-func ProcessFile() (outMP3File, outTextFile, outLogFile string, err error) {
-
-	// Get text lines from the input file
-	textLines, start, end, err := text.GetTextFileLines(config.Params.InputFileName, config.Params.Start, config.Params.End)
-	if err != nil {
-		return
-	}
-
-	// // Print extracted text lines
-	// for i, line := range textLines {
-	// 	log.Info().Msgf("%06d: %s", start+i, line)
-	// }
-
-	// calculate file name for the output file
-	outputFileName := fmt.Sprintf("%s.lines-%06d-%06d", config.Params.OutputFileName, start, end)
-
-	// remove the output mp3 file if it exists
-	// TODO: move down
-	err = os.Remove(outputFileName + ".mp3")
-	if err != nil {
-		log.Info().Msgf("Failed to delete the output file: %v", err)
-	}
-
-	// remove the output text file if it exists
-	err = os.Remove(outputFileName + ".txt")
-	if err != nil {
-		log.Info().Msgf("Failed to delete the output file: %v", err)
-	}
-
-	// clear directory of text and sound files
-	app.RemoveTempFiles()
-
-	// return nil
-
-	// HERE: process the jobs in the pipeline -----------------
-	processedJobs, err := DoPipeline(textLines)
-	if err != nil {
-		return
-	}
-
-	// create file list of audio files for concatenation
-	err = CreateFileList(processedJobs)
-	if err != nil {
-		return
-	}
-
-	// concatenate the audio files into one
-	outMP3File = outputFileName + ".mp3"
-	err = sound.ConcatenateMP3Files(config.Params.FileListFileName, outMP3File)
-	if err != nil {
-		return
-	}
-
-	// write a text file with processed lines
-	outTextFile = outputFileName + ".txt"
-	err = text.SaveTextFile(outTextFile, strings.Join(textLines, "\n"))
-	if err != nil {
-		return
-	}
-
-	// write log of processed jobs
-	outLogFile = outputFileName + ".log.json"
-	err = text.SaveTextFile(outLogFile, PrettyJSON(processedJobs))
-	if err != nil {
-		return
-	}
-
-	return
-}
-
 // CreateFileList - creates a file list of audio files for concatenation with ffmpeg
 // File list example:
 // file 'file1.mp3'
@@ -200,11 +127,25 @@ func ProcessFile() (outMP3File, outTextFile, outLogFile string, err error) {
 func CreateFileList(jobs []Job) (err error) {
 	fileList := ""
 	for _, job := range jobs {
-		fileList += fmt.Sprintf("file '%s'\n", job.AudioFile)
+		fileList += fmt.Sprintf("file '%s'\n", job.Results.AudioFile)
 	}
 	err = text.SaveTextFile(config.Params.FileListFileName, fileList)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+// JoinMP3Files - joins the processed jobs into one mp3 file.
+func JoinMP3Files(processedJobs []Job, outputBaseName string) (outMP3File string, err error) {
+	// create file list of audio files for concatenation
+	err = CreateFileList(processedJobs)
+	if err != nil {
+		return
+	}
+
+	// concatenate the audio files into one
+	outMP3File = outputBaseName + ".mp3"
+	err = sound.ConcatenateMP3Files(config.Params.FileListFileName, outMP3File)
+	return
 }

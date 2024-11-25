@@ -21,14 +21,14 @@ func main() {
 	go stopper.WaitForCancel()
 
 	startTime := time.Now()
-	mp3File, txtFile, lofFile, err := pipe.ProcessFile()
+	mp3File, txtFile, taskFile, err := pipe.ProcessFile()
 	if err != nil {
 		log.Error().Msgf("Failed to process file: %v", err)
 	} else {
 		log.Info().Msg("File processed successfully.")
 		log.Info().Msgf("MP3 file: %s", mp3File)
 		log.Info().Msgf("Text file: %s", txtFile)
-		log.Info().Msgf("Log file: %s", lofFile)
+		log.Info().Msgf("Log file: %s", taskFile)
 	}
 	// Log duration of the operation
 	duration := time.Since(startTime)

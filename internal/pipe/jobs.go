@@ -7,11 +7,26 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"github.com/vadim-ivlev/voiceover/internal/config"
 )
 
 // JobFunction - function that processes a job.
 // It takes a job and returns a modified job and a possible error.
 type JobFunction func(Job) (Job, error)
+
+type Task struct {
+	Command   string        `json:"command"`
+	Params    config.Config `json:"params"`
+	StartTime time.Time     `json:"start_time"`
+	EndTime   time.Time     `json:"end_time"`
+	Duration  time.Duration `json:"duration"`
+	Jobs      []Job         `json:"jobs"`
+	Results   struct {
+		SoundFile string `json:"sound_file"`
+		TextFile  string `json:"text_file"`
+	} `json:"results"`
+	TaskErrors []string `json:"task_errors"`
+}
 
 type ProcessLogRecord struct {
 	JobID           int           `json:"job_id"`
@@ -22,19 +37,22 @@ type ProcessLogRecord struct {
 	Duration        time.Duration `json:"-"`
 	DurationSeconds float64       `json:"duration_seconds"`
 	Error           string        `json:"error"`
+	Result          any           `json:"result"`
 }
 
 type Job struct {
 	// Unique identifier for the job
-	ID int `json:"id"`
-	// Text to process
-	Text string `json:"text"`
-	// Voice
-	Voice string `json:"voice"`
-	// Text file
-	TextFile string `json:"text_file"`
-	// Audio file
-	AudioFile string `json:"audio_file"`
+	ID      int `json:"id"`
+	Results struct {
+		// Text to process
+		Text string `json:"text"`
+		// Voice
+		Voice string `json:"voice"`
+		// Text file
+		TextFile string `json:"text_file"`
+		// Audio file
+		AudioFile string `json:"audio_file"`
+	} `json:"results"`
 	// Process Log. Records of the processing steps for the job
 	ProcessLog []ProcessLogRecord `json:"process_log"`
 }

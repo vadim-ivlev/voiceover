@@ -70,6 +70,8 @@ func DoWork(wg *sync.WaitGroup, work, workerName string, operation JobFunction, 
 			Worker:    workerName,
 			StartTime: time.Now(),
 		}
+		job.ProcessLog = append(job.ProcessLog, logRecord)
+
 		Nap()
 		job, err := operation(job)
 		if err != nil {
@@ -79,7 +81,6 @@ func DoWork(wg *sync.WaitGroup, work, workerName string, operation JobFunction, 
 		logRecord.Duration = logRecord.EndTime.Sub(logRecord.StartTime)
 		logRecord.DurationSeconds = logRecord.Duration.Seconds()
 
-		job.ProcessLog = append(job.ProcessLog, logRecord)
 		LogJob(job, fmt.Sprintf("done by %10s in %.3f seconds", workerName, logRecord.DurationSeconds))
 		out <- job
 	}

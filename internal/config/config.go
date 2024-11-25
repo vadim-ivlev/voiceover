@@ -12,8 +12,8 @@ import (
 	"github.com/caarlos0/env/v11"
 )
 
-// config - структура для хранения параметров приложения
-type config struct {
+// Config - структура для хранения параметров приложения
+type Config struct {
 	// env
 	GcloudProject     string `json:"gcloud_project" env:"GCLOUD_PROJECT"`
 	GcloudAccessToken string `json:"gcloud_access_token" env:"GCLOUD_ACCESS_TOKEN"`
@@ -34,7 +34,7 @@ type config struct {
 	NapTime int `json:"nap_time"`
 }
 
-func (c config) String() string {
+func (c Config) String() string {
 	bytes, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
 		log.Error().Msg(err.Error())
@@ -43,7 +43,7 @@ func (c config) String() string {
 }
 
 // Params - переменная для хранения параметров приложения
-var Params config = config{}
+var Params Config = Config{}
 
 func customUsage() {
 	fmt.Fprintf(os.Stderr, `
