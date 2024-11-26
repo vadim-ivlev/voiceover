@@ -57,9 +57,9 @@ func soundOperation(job Job) (Job, error) {
 
 	// if voice is empty, generate silence
 	if job.Results.Voice == "" {
-		err = sound.GenerateSilenceMP3(0.7, job.Results.AudioFile)
+		err = sound.GenerateSilenceMP3(config.Params.Pause, job.Results.AudioFile)
 	} else {
-		err = sound.GenerateSpeechMP3(1.0, job.Results.Voice, job.Results.Text, job.Results.AudioFile)
+		err = sound.GenerateSpeechMP3(config.Params.Speed, job.Results.Voice, job.Results.Text, job.Results.AudioFile)
 	}
 	if err != nil {
 		return job, err
