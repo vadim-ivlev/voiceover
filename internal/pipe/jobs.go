@@ -4,6 +4,8 @@ package pipe
 
 import (
 	"encoding/json"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -28,7 +30,7 @@ type Task struct {
 	TaskErrors []string `json:"task_errors"`
 }
 
-var pPreviousTask *Task
+// var pPreviousTask *Task
 
 type WorkLogRecord struct {
 	JobID           int           `json:"job_id"`
@@ -78,4 +80,53 @@ func PrettyJSON(data interface{}) string {
 		log.Error().Msg(err.Error())
 	}
 	return string(bytes)
+}
+
+func RemoveTempDirs() {
+	err := os.RemoveAll(config.Params.TextsDir)
+	if err != nil {
+		log.Warn().Msg(err.Error())
+	}
+	err = os.RemoveAll(config.Params.SoundsDir)
+	if err != nil {
+		log.Warn().Msg(err.Error())
+	}
+}
+
+func CreateTempDirs() {
+	err := os.MkdirAll(config.Params.TextsDir, 0755)
+	if err != nil {
+		log.Error().Msg(err.Error())
+	}
+	err = os.MkdirAll(config.Params.SoundsDir, 0755)
+	if err != nil {
+		log.Error().Msg(err.Error())
+	}
+}
+
+// CreateOrRestoreTask - Create a new task or restore the previous one/
+// If a previous task file is provided, the task parameters are copied from the previous task.
+func CreateOrRestoreTask() (task Task, err error) {
+	task = Task{}
+
+	// check if we should continue a previous task
+	if config.Params.TaskFile == "" {
+		// clear directory of text and sound files
+		RemoveFileListFile()
+		RemoveTempDirs()
+		CreateTempDirs()
+		task.Command = strings.Join(os.Args, " ")
+		task.Params = config.Params
+	} else {
+		pPreviousTask := new(Task)
+		err = LoadJSONFile(config.Params.TaskFile, pPreviousTask)
+		if err != nil {
+			return
+		}
+		task = *pPreviousTask
+		// copy the previous task parameters to the current task
+		config.Params = task.Params
+		CreateTempDirs()
+	}
+	return
 }

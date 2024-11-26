@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -11,26 +10,35 @@ import (
 )
 
 func main() {
-	app.InitApp()
-	log.Info().Msgf("GCLOUD_PROJECT: %s", os.Getenv("GCLOUD_PROJECT"))
+	startTime := time.Now()
+
+	app.InitLoggerSetParams()
 	app.ExitIfNoFileToProcess()
-	app.RemoveTempFiles()
+
 	log.Info().Msg("Application started.")
 
 	// Start watching for the cancel signal
 	go stopper.WaitForCancel()
 
-	startTime := time.Now()
-	mp3File, txtFile, taskFile, err := pipe.ProcessFile()
+	// Process the input file
+	mp3File, txtFile, taskFile, numDone, err := pipe.ProcessFile()
 	if err != nil {
 		log.Error().Msgf("Failed to process file: %v", err)
 	} else {
-		log.Info().Msg("File processed successfully.")
-		log.Info().Msgf("MP3 file: %s", mp3File)
-		log.Info().Msgf("Text file: %s", txtFile)
-		log.Info().Msgf("Log file: %s", taskFile)
+		ResultMessage(mp3File, txtFile, taskFile, numDone)
 	}
-	// Log duration of the operation
+
 	duration := time.Since(startTime)
 	log.Info().Msgf("Operation completed. Duration: %v", duration)
+}
+
+func ResultMessage(mp3File, txtFile, taskFile string, numDone int) {
+	log.Info().Msgf(`
+	%d paragraphs processed.
+	Output files
+		MP3 file:  %s
+		Text file: %s
+		Log file:  %s
+	----------------------------	
+	`, numDone, mp3File, txtFile, taskFile)
 }

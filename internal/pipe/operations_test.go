@@ -15,7 +15,7 @@ func TestMain(m *testing.M) {
 
 	// change directory to the root of the project
 	os.Chdir("../..")
-	app.InitApp()
+	app.InitLoggerSetParams()
 	fmt.Println("TestMain")
 
 	os.Exit(m.Run())
@@ -38,7 +38,7 @@ func TestProcessFile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if _, _, _, err := ProcessFile(); (err != nil) != tt.wantErr {
+			if _, _, _, _, err := ProcessFile(); (err != nil) != tt.wantErr {
 				t.Errorf("StartFileProcessing() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			// sound.PlayMP3(tt.args.filePath + ".mp3")

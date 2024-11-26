@@ -16,18 +16,18 @@ func newJobsArray(numJobs int) []Job {
 			ID: i,
 		}
 	}
+	return jobs
+}
 
-	// load previous jobs
-	if pPreviousTask != nil && len(pPreviousTask.Jobs) > 0 {
-		for _, job := range pPreviousTask.Jobs {
-			i := job.ID
-			if i < numJobs {
-				jobs[i] = job
-			}
+// loadPreviuosJobs - loads the previous jobs to the new jobs array.
+func loadPreviuosJobs(newJobs []Job, task Task) {
+	numNewJobs := len(newJobs)
+	for _, job := range task.Jobs {
+		i := job.ID
+		if i < numNewJobs {
+			newJobs[i] = job
 		}
 	}
-
-	return jobs
 }
 
 // toChannel - moves the jobs from the array to the channel

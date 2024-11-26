@@ -74,7 +74,7 @@ func ParseCommandLine() {
 	flag.IntVar(&Params.End, "e", 0, "Number of the last line of the file to process. Last line will not be processed. 0 - process to the end of the file.")
 	flag.StringVar(&Params.Voices, "voices", "", "Comma separated list of voices (alloy,echo,fable,onyx,nova,shimmer). No spaces.")
 	flag.StringVar(&Params.OutputFileName, "o", "", "Output file name. If empty, will be equal to the input file name.")
-	flag.StringVar(&Params.TaskFile, "taskfile", "", "Previous task file to continue processing.")
+	flag.StringVar(&Params.TaskFile, "task", "", "Previous task file to continue processing.")
 
 	flag.IntVar(&Params.NapTime, "nap", 0, "Random nap time up to the given value in milliseconds between worker operations")
 	flag.Parse()

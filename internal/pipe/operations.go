@@ -96,9 +96,12 @@ func toArray(jobsChan chan Job) []Job {
 // Returns:
 // an array of processed jobs
 // an error if any
-func DoPipeline(textLines []string) (doneJobs []Job, err error) {
+func DoPipeline(textLines []string, task Task) (doneJobs []Job, err error) {
 
 	numLines := len(textLines)
+
+	jobs := newJobsArray(numLines)
+	loadPreviuosJobs(jobs, task)
 
 	// Create channels to pass the jobs between the workers
 	jobsChan := make(chan Job)
@@ -107,7 +110,7 @@ func DoPipeline(textLines []string) (doneJobs []Job, err error) {
 	soundChan := make(chan Job, numLines)
 
 	// Fill the jobs channel with the jobs from a newly created array
-	go toChannel(newJobsArray(numLines), jobsChan)
+	go toChannel(jobs, jobsChan)
 	// add a text to each job and assign a voice
 	// doTeamWork(1, "T", getTextOperation(textLines), jobsChan, textChan)
 	go DoWork(nil, "Text", "T", getTextOperation(textLines), jobsChan, textChan)
@@ -127,6 +130,9 @@ func DoPipeline(textLines []string) (doneJobs []Job, err error) {
 // Parameters:
 // jobs: the jobs to process
 func CreateFileList(jobs []Job) (err error) {
+
+	RemoveFileListFile()
+
 	fileList := ""
 	for _, job := range jobs {
 		fileList += fmt.Sprintf("file '%s'\n", job.Results.AudioFile)
@@ -138,17 +144,54 @@ func CreateFileList(jobs []Job) (err error) {
 	return nil
 }
 
-// JoinMP3Files - joins the processed jobs into one mp3 file.
-func JoinMP3Files(processedJobs []Job, outputBaseName string) (outMP3File string, err error) {
+func RemoveFileListFile() {
+	err := os.RemoveAll(config.Params.FileListFileName)
+	if err != nil {
+		log.Warn().Msg(err.Error())
+	}
+}
+
+// CreateOutputMP3 - joins the processed jobs into one mp3 file.
+func CreateOutputMP3(processedJobs []Job, outputBaseName string) (outMP3File string, err error) {
 	// create file list of audio files for concatenation
 	err = CreateFileList(processedJobs)
 	if err != nil {
 		return
 	}
 
+	// remove the output mp3 file if it exists
+	err = os.Remove(outputBaseName + ".mp3")
+	if err != nil {
+		log.Info().Msgf("Failed to delete the output file: %v", err)
+	}
+
 	// concatenate the audio files into one
 	outMP3File = outputBaseName + ".mp3"
 	err = sound.ConcatenateMP3Files(config.Params.FileListFileName, outMP3File)
+	return
+}
+
+// CreateOutputText - joins the processed jobs into one text file.
+func CreateOutputText(processedJobs []Job, outputBaseName string) (outTextFile string, err error) {
+	// remove the output text file if it exists
+	err = os.Remove(outputBaseName + ".txt")
+	if err != nil {
+		log.Info().Msgf("Failed to delete the output file: %v", err)
+	}
+
+	// get the text lines from the processed jobs
+	textLines := []string{}
+	for _, job := range processedJobs {
+		textLines = append(textLines, job.Results.Text)
+	}
+
+	// write a text file with processed lines
+	outTextFile = outputBaseName + ".txt"
+	err = text.SaveTextFile(outTextFile, strings.Join(textLines, "\n"))
+	if err != nil {
+		return
+	}
+
 	return
 }
 

@@ -15,7 +15,7 @@ func TestMain(m *testing.M) {
 
 	// change directory to the root of the project
 	os.Chdir("../..")
-	app.InitApp()
+	app.InitLoggerSetParams()
 	fmt.Println("TestMain")
 
 	os.Exit(m.Run())
