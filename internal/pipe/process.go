@@ -52,6 +52,11 @@ func ProcessFile() (outMP3File, outTextFile, outTaskFile string, numDone int, er
 	task.EndTime = time.Now()
 	task.Duration = task.EndTime.Sub(task.StartTime)
 	task.Jobs = processedJobs
+	task.Results.SoundFile = outMP3File
+	task.Results.TextFile = outTextFile
+	if numDone != len(textLines) {
+		task.TaskErrors = fmt.Sprintf("Only %d of %d paragraphs processed.", numDone, len(textLines))
+	}
 
 	outTaskFile = outputBaseName + ".task.json"
 	err = text.SaveTextFile(outTaskFile, PrettyJSON(task))

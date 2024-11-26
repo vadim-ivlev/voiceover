@@ -27,7 +27,7 @@ type Task struct {
 		SoundFile string `json:"sound_file"`
 		TextFile  string `json:"text_file"`
 	} `json:"results"`
-	TaskErrors []string `json:"task_errors"`
+	TaskErrors string `json:"task_errors"`
 }
 
 // var pPreviousTask *Task
