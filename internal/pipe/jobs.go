@@ -50,6 +50,8 @@ type Job struct {
 	Results struct {
 		// Text to process
 		Text string `json:"text"`
+		// Translated text
+		TranslatedText string `json:"translated_text"`
 		// Voice
 		Voice string `json:"voice"`
 		// Text file

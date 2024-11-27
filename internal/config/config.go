@@ -34,6 +34,7 @@ type Config struct {
 	TaskFile         string  `json:"task_file"`
 	Speed            float64 `json:"speed"`
 	Pause            float64 `json:"pause"`
+	TranslateTo      string  `json:"translate_to"`
 
 	// debug variables
 	NapTime int `json:"nap_time"`
@@ -80,6 +81,7 @@ func ParseCommandLine() {
 	flag.StringVar(&Params.TaskFile, "task", "", "Previous task file to continue processing.")
 	flag.Float64Var(&Params.Speed, "speed", 1.0, "Speed of the voice.")
 	flag.Float64Var(&Params.Pause, "pause", 0.7, "Pause between paragraphs in seconds.")
+	flag.StringVar(&Params.TranslateTo, "translateto", "", "Translate text to the given language. Russian, German, etc.")
 
 	flag.IntVar(&Params.NapTime, "nap", 0, "Random nap time up to the given value in milliseconds between worker operations")
 	flag.Parse()

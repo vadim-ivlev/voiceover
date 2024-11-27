@@ -13,6 +13,7 @@ import (
 	"github.com/vadim-ivlev/voiceover/internal/config"
 	"github.com/vadim-ivlev/voiceover/pkg/sound"
 	"github.com/vadim-ivlev/voiceover/pkg/texts"
+	"github.com/vadim-ivlev/voiceover/pkg/translator"
 	"golang.org/x/exp/rand"
 )
 
@@ -44,13 +45,31 @@ func getTextOperation(textLines []string) JobFunction {
 	}
 }
 
+// translateTextOperation - translates the text
+func translateTextOperation(job Job) (Job, error) {
+	// check if the text is empty or we don't need to translate
+	if job.Results.Text == "" || config.Params.TranslateTo == "" {
+		job.Results.TranslatedText = strings.TrimSpace(job.Results.Text)
+		return job, nil
+	}
+
+	// translate the text
+	translatedText, err := translator.TranslateText(config.Params.OpenaiAPIURL, config.Params.ApiKey, config.Params.TranslateTo, job.Results.Text)
+	if err != nil {
+		return job, err
+	}
+	// save the translated text to the job
+	job.Results.TranslatedText = translatedText
+	return job, nil
+}
+
 // soundOperation - generates a sound file and a text file for the job
 func soundOperation(job Job) (Job, error) {
 	job.Results.TextFile = fmt.Sprintf("%s/%08d.txt", config.Params.TextsDir, job.ID)
 	job.Results.AudioFile = fmt.Sprintf("%s/%08d.mp3", config.Params.SoundsDir, job.ID)
 
 	// select voice
-	if len(job.Results.Text) > 0 {
+	if len(job.Results.TranslatedText) > 0 {
 		job.Results.Voice = audio.NextVoice()
 	}
 
@@ -58,16 +77,15 @@ func soundOperation(job Job) (Job, error) {
 
 	// if voice is empty, generate silence
 	if job.Results.Voice == "" {
-
 		err = sound.GenerateSilenceMP3(config.Params.Pause, job.Results.AudioFile)
 	} else {
-		err = audio.GenerateSpeechMP3(config.Params.Speed, job.Results.Voice, job.Results.Text, job.Results.AudioFile)
+		err = audio.GenerateSpeechMP3(config.Params.Speed, job.Results.Voice, job.Results.TranslatedText, job.Results.AudioFile)
 	}
 	if err != nil {
 		return job, err
 	}
 
-	err = texts.SaveTextFile(job.Results.TextFile, job.Results.Text)
+	err = texts.SaveTextFile(job.Results.TextFile, job.Results.TranslatedText)
 	if err != nil {
 		return job, err
 	}
@@ -108,16 +126,22 @@ func DoPipeline(textLines []string, task Task) (doneJobs []Job, err error) {
 	// Create channels to pass the jobs between the workers
 	jobsChan := make(chan Job)
 	textChan := make(chan Job)
+	translChan := make(chan Job)
 	// soundChan must be buffered because its jobs will be sorted after it is closed
 	soundChan := make(chan Job, numLines)
 
 	// Fill the jobs channel with the jobs from a newly created array
 	go toChannel(jobs, jobsChan)
+
 	// add a text to each job and assign a voice
 	// doTeamWork(1, "T", getTextOperation(textLines), jobsChan, textChan)
 	go DoWork(nil, "Text", "T", getTextOperation(textLines), jobsChan, textChan)
+
+	// translate the text.
+	go DoWork(nil, "Translate", "Tr", translateTextOperation, textChan, translChan)
+
 	// generate sound file for each job. Fan-out.
-	doTeamWork(10, "Sound", "S", soundOperation, textChan, soundChan)
+	doTeamWork(10, "Sound", "S", soundOperation, translChan, soundChan)
 
 	// gatther the jobs into an array. Fan-in.
 	doneJobs = toArray(soundChan)
@@ -184,7 +208,7 @@ func CreateOutputText(processedJobs []Job, outputBaseName string) (outTextFile s
 	// get the text lines from the processed jobs
 	textLines := []string{}
 	for _, job := range processedJobs {
-		textLines = append(textLines, job.Results.Text)
+		textLines = append(textLines, job.Results.TranslatedText)
 	}
 
 	// write a text file with processed lines
