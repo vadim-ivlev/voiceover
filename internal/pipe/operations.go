@@ -9,9 +9,10 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"github.com/vadim-ivlev/voiceover/internal/audio"
 	"github.com/vadim-ivlev/voiceover/internal/config"
-	"github.com/vadim-ivlev/voiceover/internal/sound"
-	"github.com/vadim-ivlev/voiceover/internal/text"
+	"github.com/vadim-ivlev/voiceover/pkg/sound"
+	"github.com/vadim-ivlev/voiceover/pkg/text"
 	"golang.org/x/exp/rand"
 )
 
@@ -50,16 +51,17 @@ func soundOperation(job Job) (Job, error) {
 
 	// select voice
 	if len(job.Results.Text) > 0 {
-		job.Results.Voice = sound.NextVoice()
+		job.Results.Voice = audio.NextVoice()
 	}
 
 	var err error
 
 	// if voice is empty, generate silence
 	if job.Results.Voice == "" {
+
 		err = sound.GenerateSilenceMP3(config.Params.Pause, job.Results.AudioFile)
 	} else {
-		err = sound.GenerateSpeechMP3(config.Params.Speed, job.Results.Voice, job.Results.Text, job.Results.AudioFile)
+		err = audio.GenerateSpeechMP3(config.Params.Speed, job.Results.Voice, job.Results.Text, job.Results.AudioFile)
 	}
 	if err != nil {
 		return job, err
@@ -167,7 +169,7 @@ func CreateOutputMP3(processedJobs []Job, outputBaseName string) (outMP3File str
 
 	// concatenate the audio files into one
 	outMP3File = outputBaseName + ".mp3"
-	err = sound.ConcatenateMP3Files(config.Params.FileListFileName, outMP3File)
+	err = audio.ConcatenateMP3Files(config.Params.FileListFileName, outMP3File)
 	return
 }
 

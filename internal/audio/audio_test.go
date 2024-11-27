@@ -1,4 +1,4 @@
-package sound
+package audio
 
 import (
 	"fmt"

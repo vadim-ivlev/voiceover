@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/vadim-ivlev/voiceover/internal/config"
-	"github.com/vadim-ivlev/voiceover/internal/text"
+	"github.com/vadim-ivlev/voiceover/pkg/text"
 )
 
 // ********************************************************************************************************************

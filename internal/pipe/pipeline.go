@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/vadim-ivlev/voiceover/internal/stopper"
+	"github.com/vadim-ivlev/voiceover/pkg/stopper"
 )
 
 // newJobsArray - creates an array of jobs.

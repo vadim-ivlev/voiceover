@@ -7,8 +7,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-
-	"github.com/vadim-ivlev/voiceover/internal/config"
 )
 
 type openaiTTSRequest struct {
@@ -19,8 +17,8 @@ type openaiTTSRequest struct {
 }
 
 // GenerateOpenaiSpeechMP3 generates an MP3 file with the given text using the OpenAI API.
-func GenerateOpenaiSpeechMP3(speed float64, voice, text, fileName string) error {
-	url := config.Params.OpenaiAPIURL + "/v1/audio/speech"
+func GenerateOpenaiSpeechMP3(apiURL, apiKey string, speed float64, voice, text, fileName string) error {
+	url := apiURL + "/v1/audio/speech"
 	ttsReq := openaiTTSRequest{
 		Model: "tts-1",
 		Input: text,
@@ -38,7 +36,7 @@ func GenerateOpenaiSpeechMP3(speed float64, voice, text, fileName string) error 
 		return fmt.Errorf("failed to create request: %v", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+config.Params.ApiKey)
+	req.Header.Set("Authorization", "Bearer "+apiKey)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}

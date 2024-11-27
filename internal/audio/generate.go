@@ -1,4 +1,4 @@
-package sound
+package audio
 
 import (
 	"bytes"
@@ -8,6 +8,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/vadim-ivlev/voiceover/internal/config"
+	"github.com/vadim-ivlev/voiceover/pkg/sound"
 )
 
 // alloy, echo, fable, onyx, nova, shimmer
@@ -37,11 +38,11 @@ func NextVoice() string {
 func GenerateSpeechMP3(speed float64, voice, text, fileName string) error {
 	switch config.Params.TTSAPI {
 	case "openai":
-		return GenerateOpenaiSpeechMP3(speed, voice, text, fileName)
+		return sound.GenerateOpenaiSpeechMP3(config.Params.OpenaiAPIURL, config.Params.ApiKey, speed, voice, text, fileName)
 	case "google":
-		return GenerateGoogleSpeechMP3(speed, voice, text, fileName)
+		return sound.GenerateGoogleSpeechMP3(speed, voice, text, fileName)
 	case "elevenlabs":
-		return GenerateElevenlabsSpeechMP3(speed, voice, text, fileName)
+		return sound.GenerateElevenlabsSpeechMP3(speed, voice, text, fileName)
 	default:
 		return fmt.Errorf("unsupported engine: %s", config.Params.TTSAPI)
 	}
