@@ -40,7 +40,7 @@ const (
 	ElevenlabsVoiceAdamStone string = "NFG5qt843uXKj4pFvR7C"
 	ElevenlabsVoiceAlice     string = "Xb7hH8MSUJpSbSDYk0k2"
 	ElevenlabsVoiceBrian     string = "7p1URySAeSeJtThZmKB5"
-	ElevenlabsVoiceValentino string = "7p1URySAeSeJtThZmKB5"
+	ElevenlabsVoiceValentino string = "HgJDD5cRFQsVhwzXouaI"
 )
 
 func GenerateElevenlabsSpeechMP3(apiKey string, voice, text, fileName string) error {
