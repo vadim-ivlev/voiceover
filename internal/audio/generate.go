@@ -42,7 +42,7 @@ func GenerateSpeechMP3(speed float64, voice, text, fileName string) error {
 	case "google":
 		return sound.GenerateGoogleSpeechMP3(speed, voice, text, fileName)
 	case "elevenlabs":
-		return sound.GenerateElevenlabsSpeechMP3(speed, voice, text, fileName)
+		return sound.GenerateElevenlabsSpeechMP3(config.Params.ElevenlabsAPIKey, voice, text, fileName)
 	default:
 		return fmt.Errorf("unsupported engine: %s", config.Params.TTSAPI)
 	}

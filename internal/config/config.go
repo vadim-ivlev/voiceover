@@ -17,6 +17,7 @@ type Config struct {
 	// env
 	GcloudProject     string `json:"gcloud_project" env:"GCLOUD_PROJECT"`
 	GcloudAccessToken string `json:"gcloud_access_token" env:"GCLOUD_ACCESS_TOKEN"`
+	ElevenlabsAPIKey  string `json:"elevenlabs_api_key" env:"ELEVENLABS_API_KEY"`
 	OpenaiAPIURL      string `json:"openai_api_url" env:"OPENAI_API_URL" envDefault:"https://api.openai.com"`
 	ApiKey            string `json:"api_key" env:"API_KEY"`
 

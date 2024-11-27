@@ -1,3 +1,7 @@
+// Description: This file contains the code to generate speech using the Elevenlabs API.
+// Documentation:
+// https://elevenlabs.io/docs/api-reference/text-to-speech
+
 package sound
 
 import (
@@ -10,47 +14,54 @@ import (
 )
 
 type ElevenlabsVoiceSettings struct {
-	Stability       int  `json:"stability"`
-	SimilarityBoost int  `json:"similarity_boost"`
-	Style           int  `json:"style"`
-	UseSpeakerBoost bool `json:"use_speaker_boost"`
+	Stability       float64 `json:"stability"`
+	SimilarityBoost float64 `json:"similarity_boost"`
+	Style           float64 `json:"style,omitempty"`             // default:"0.0" -greatly improves the speed of generation
+	UseSpeakerBoost bool    `json:"use_speaker_boost,omitempty"` // default:"true"
 }
 
 type ElevenlabsRequestBody struct {
 	Text                            string                  `json:"text"`
-	ModelID                         string                  `json:"model_id"`
-	LanguageCode                    string                  `json:"language_code"`
+	ModelID                         string                  `json:"model_id"`                // default: "eleven_monolingual_v1"
+	LanguageCode                    string                  `json:"language_code,omitempty"` //Currently only Turbo v2.5 supports language enforcement.
 	VoiceSettings                   ElevenlabsVoiceSettings `json:"voice_settings"`
-	PronunciationDictionaryLocators []interface{}           `json:"pronunciation_dictionary_locators"`
-	Seed                            int                     `json:"seed"`
-	PreviousText                    string                  `json:"previous_text"`
-	NextText                        string                  `json:"next_text"`
-	PreviousRequestIDs              []string                `json:"previous_request_ids"`
-	NextRequestIDs                  []string                `json:"next_request_ids"`
-	UsePvcAsIvc                     bool                    `json:"use_pvc_as_ivc"`
-	ApplyTextNormalization          string                  `json:"apply_text_normalization"`
+	PronunciationDictionaryLocators []interface{}           `json:"pronunciation_dictionary_locators,omitempty"`
+	Seed                            int                     `json:"seed,omitempty"`
+	PreviousText                    string                  `json:"previous_text,omitempty"`
+	NextText                        string                  `json:"next_text,omitempty"`
+	PreviousRequestIDs              []string                `json:"previous_request_ids,omitempty"`
+	NextRequestIDs                  []string                `json:"next_request_ids,omitempty"`
+	ApplyTextNormalization          string                  `json:"apply_text_normalization,omitempty"` // default=auto  auto, on, off
 }
 
-func GenerateElevenlabsSpeechMP3(speed float64, voice, text, fileName string) error {
+// Elevenlabs voices
+const (
+	ElevenlabsVoiceSam       string = "ulNeoiyl3bUW7oQjWZE8"
+	ElevenlabsVoiceAdamStone string = "NFG5qt843uXKj4pFvR7C"
+	ElevenlabsVoiceAlice     string = "Xb7hH8MSUJpSbSDYk0k2"
+	ElevenlabsVoiceBrian     string = "7p1URySAeSeJtThZmKB5"
+	ElevenlabsVoiceValentino string = "7p1URySAeSeJtThZmKB5"
+)
+
+func GenerateElevenlabsSpeechMP3(apiKey string, voice, text, fileName string) error {
 	url := fmt.Sprintf("https://api.elevenlabs.io/v1/text-to-speech/%s", voice)
 	body := ElevenlabsRequestBody{
-		Text:         text,
-		ModelID:      "your_model_id",
-		LanguageCode: "your_language_code",
+		Text:    text,
+		ModelID: "eleven_multilingual_v2",
+		// LanguageCode: "en", // en-US, en-GB, fr-FR, de-DE, es-ES, it-IT, nl-NL, pt-PT, ru-RU, zh-CN, ja-JP, ko-KR
 		VoiceSettings: ElevenlabsVoiceSettings{
-			Stability:       123,
-			SimilarityBoost: 123,
-			Style:           123,
+			Stability:       0.4,
+			SimilarityBoost: 0.8,
+			// Style:           0.0, // default: 0.0 -greatly improves the speed of generation
 			UseSpeakerBoost: true,
 		},
-		PronunciationDictionaryLocators: []interface{}{},
-		Seed:                            123,
-		PreviousText:                    "",
-		NextText:                        "",
-		PreviousRequestIDs:              []string{},
-		NextRequestIDs:                  []string{},
-		UsePvcAsIvc:                     true,
-		ApplyTextNormalization:          "auto",
+		// PronunciationDictionaryLocators: []interface{}{},
+		// Seed:                   123,
+		// PreviousText:           "",
+		// NextText:               "",
+		// PreviousRequestIDs:     []string{},
+		// NextRequestIDs:         []string{},
+		// ApplyTextNormalization: "auto",
 	}
 
 	jsonData, err := json.Marshal(body)
@@ -64,6 +75,8 @@ func GenerateElevenlabsSpeechMP3(speed float64, voice, text, fileName string) er
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "audio/mpeg")
+	req.Header.Set("xi-api-key", apiKey)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
