@@ -27,11 +27,11 @@
             "showLog": true
         },
         {
-            "name": "main.go",
+            "name": "voiceover",
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/main.go",
+            "program": "${workspaceFolder}/cmd/voiceover/main.go",
             "args": [
                 "-s",
                 "90",
@@ -43,11 +43,11 @@
             ],
         },
         {
-            "name": "main.go-continue",
+            "name": "voiceover-continue",
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/main.go",
+            "program": "${workspaceFolder}/cmd/voiceover/main.go",
             "args": [
                 "-nap",
                 "1000",
