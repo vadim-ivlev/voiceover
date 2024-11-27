@@ -7,7 +7,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/vadim-ivlev/voiceover/internal/config"
-	"github.com/vadim-ivlev/voiceover/internal/logger"
+	"github.com/vadim-ivlev/voiceover/pkg/logger"
 )
 
 // InitLoggerSetParams - initializes the application

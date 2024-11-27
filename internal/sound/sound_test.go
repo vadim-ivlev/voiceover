@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/vadim-ivlev/voiceover/internal/app"
-	"github.com/vadim-ivlev/voiceover/internal/logger"
+	"github.com/vadim-ivlev/voiceover/pkg/logger"
 )
 
 func TestMain(m *testing.M) {
