@@ -1,4 +1,4 @@
-package text
+package texts
 
 import (
 	"bufio"
@@ -12,8 +12,8 @@ import (
 
 var splitString = "\n"
 
-// SplitTextFile splits a text file into an array of strings.
-func SplitTextFile(fileName string) ([]string, error) {
+// splitTextFile splits a text file into an array of strings.
+func splitTextFile(fileName string) ([]string, error) {
 	// read the text file
 	bytes, err := os.ReadFile(fileName)
 	if err != nil {
@@ -27,8 +27,8 @@ func SplitTextFile(fileName string) ([]string, error) {
 	return lines, nil
 }
 
-// SplitTextFileScan splits a text file into an array of strings.
-func SplitTextFileScan(fileName string) (lines []string, err error) {
+// splitTextFileScan splits a text file into an array of strings.
+func splitTextFileScan(fileName string) (lines []string, err error) {
 	// read the text file
 	file, err := os.Open(fileName)
 	if err != nil {
@@ -77,6 +77,11 @@ func SaveTextFile(fileName, text string) error {
 	return nil
 }
 
+// SaveTextFileLines saves an array of strings to a text file.
+func SaveTextFileLines(fileName string, lines []string) error {
+	return SaveTextFile(fileName, strings.Join(lines, "\n"))
+}
+
 // GetTextFileLines - splits a text file into an array of strings.
 // Parameters:
 // - fileName: the name of the file to split.
@@ -87,7 +92,7 @@ func SaveTextFile(fileName, text string) error {
 // - start: the actual index of the first line of the returned strings.
 // - end: the actual index of the last line of the returned strings.
 func GetTextFileLines(fileName string, startIndex, endIndex int) (lines []string, start, end int, err error) {
-	allLines, err := SplitTextFileScan(fileName)
+	allLines, err := splitTextFileScan(fileName)
 	if err != nil {
 		return nil, 0, 0, err
 	}
@@ -117,5 +122,4 @@ func GetTextFileLines(fileName string, startIndex, endIndex int) (lines []string
 	// get the lines
 	lines = allLines[startIndex:endIndex]
 	return lines, startIndex, endIndex, nil
-
 }

@@ -12,7 +12,7 @@ import (
 	"github.com/vadim-ivlev/voiceover/internal/audio"
 	"github.com/vadim-ivlev/voiceover/internal/config"
 	"github.com/vadim-ivlev/voiceover/pkg/sound"
-	"github.com/vadim-ivlev/voiceover/pkg/text"
+	"github.com/vadim-ivlev/voiceover/pkg/texts"
 	"golang.org/x/exp/rand"
 )
 
@@ -67,7 +67,7 @@ func soundOperation(job Job) (Job, error) {
 		return job, err
 	}
 
-	err = text.SaveTextFile(job.Results.TextFile, job.Results.Text)
+	err = texts.SaveTextFile(job.Results.TextFile, job.Results.Text)
 	if err != nil {
 		return job, err
 	}
@@ -139,7 +139,7 @@ func CreateFileList(jobs []Job) (err error) {
 	for _, job := range jobs {
 		fileList += fmt.Sprintf("file '%s'\n", job.Results.AudioFile)
 	}
-	err = text.SaveTextFile(config.Params.FileListFileName, fileList)
+	err = texts.SaveTextFile(config.Params.FileListFileName, fileList)
 	if err != nil {
 		return err
 	}
@@ -189,7 +189,7 @@ func CreateOutputText(processedJobs []Job, outputBaseName string) (outTextFile s
 
 	// write a text file with processed lines
 	outTextFile = outputBaseName + ".txt"
-	err = text.SaveTextFile(outTextFile, strings.Join(textLines, "\n"))
+	err = texts.SaveTextFileLines(outTextFile, textLines)
 	if err != nil {
 		return
 	}

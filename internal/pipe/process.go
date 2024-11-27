@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/vadim-ivlev/voiceover/internal/config"
-	"github.com/vadim-ivlev/voiceover/pkg/text"
+	"github.com/vadim-ivlev/voiceover/pkg/texts"
 )
 
 // ********************************************************************************************************************
@@ -21,7 +21,7 @@ func ProcessFile() (outMP3File, outTextFile, outTaskFile string, numDone int, er
 	}
 
 	// Get text lines from the input file
-	textLines, start, end, err := text.GetTextFileLines(config.Params.InputFileName, config.Params.Start, config.Params.End)
+	textLines, start, end, err := texts.GetTextFileLines(config.Params.InputFileName, config.Params.Start, config.Params.End)
 	if err != nil {
 		return
 	}
@@ -59,7 +59,7 @@ func ProcessFile() (outMP3File, outTextFile, outTaskFile string, numDone int, er
 	}
 
 	outTaskFile = outputBaseName + ".task.json"
-	err = text.SaveTextFile(outTaskFile, PrettyJSON(task))
+	err = texts.SaveTextFile(outTaskFile, PrettyJSON(task))
 
 	return
 }
