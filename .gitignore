@@ -8,5 +8,8 @@ file-list.txt
 voiceover
 *.task.json
 voiceover.zip
+# subderictories of ./texts/
+texts/*/
+
 
 
