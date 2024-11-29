@@ -3,13 +3,13 @@
 package pipe
 
 import (
-	"encoding/json"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/vadim-ivlev/voiceover/internal/config"
+	"github.com/vadim-ivlev/voiceover/pkg/utils"
 )
 
 // JobFunction - function that processes a job.
@@ -48,6 +48,15 @@ type Job struct {
 	// Unique identifier for the job
 	ID      int `json:"id"`
 	Results struct {
+		// EPUB properties
+
+		// Path to the processed file inside the EPUB
+		EpubInnerPath string `json:"epub_inner_path"`
+		// EPUB selector
+		EpubChunkSelector string `json:"epub_chunk_selector"`
+		// EPUB index of the chunk selected by the selector
+		EpubChunkIndex int `json:"epub_chunk_index"`
+
 		// Text to process
 		Text string `json:"text"`
 		// Translated text
@@ -65,23 +74,7 @@ type Job struct {
 
 // String - String representation of the job
 func (j *Job) String() string {
-	return PrettyJSON(j)
-}
-
-func CompactJSON(data interface{}) string {
-	bytes, err := json.Marshal(data)
-	if err != nil {
-		log.Error().Msg(err.Error())
-	}
-	return string(bytes)
-}
-
-func PrettyJSON(data interface{}) string {
-	bytes, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		log.Error().Msg(err.Error())
-	}
-	return string(bytes)
+	return utils.PrettyJSON(j)
 }
 
 func RemoveTempDirs() {

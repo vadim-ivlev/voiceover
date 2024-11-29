@@ -6,6 +6,8 @@ filelist.txt
 file-list.txt 
 *.epub
 voiceover
+# add subderictories of cmd
+!cmd/*
 *.task.json
 voiceover.zip
 # subderictories of ./texts/

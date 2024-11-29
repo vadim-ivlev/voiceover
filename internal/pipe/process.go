@@ -6,6 +6,7 @@ import (
 
 	"github.com/vadim-ivlev/voiceover/internal/config"
 	"github.com/vadim-ivlev/voiceover/pkg/texts"
+	"github.com/vadim-ivlev/voiceover/pkg/utils"
 )
 
 // ********************************************************************************************************************
@@ -20,7 +21,8 @@ func ProcessFile() (outMP3File, outTextFile, outTaskFile string, numDone int, er
 		return
 	}
 
-	// Get text lines from the input file
+	// Get text lines from the input fil
+	// TODO: move inside the DoPipeline function
 	textLines, start, end, err := texts.GetTextFileLines(config.Params.InputFileName, config.Params.Start, config.Params.End)
 	if err != nil {
 		return
@@ -54,12 +56,13 @@ func ProcessFile() (outMP3File, outTextFile, outTaskFile string, numDone int, er
 	task.Jobs = processedJobs
 	task.Results.SoundFile = outMP3File
 	task.Results.TextFile = outTextFile
+	// TODO: move inside the DoPipeline function
 	if numDone != len(textLines) {
 		task.TaskErrors = fmt.Sprintf("Only %d of %d paragraphs processed.", numDone, len(textLines))
 	}
 
 	outTaskFile = outputBaseName + ".task.json"
-	err = texts.SaveTextFile(outTaskFile, PrettyJSON(task))
+	err = texts.SaveTextFile(outTaskFile, utils.PrettyJSON(task))
 
 	return
 }
