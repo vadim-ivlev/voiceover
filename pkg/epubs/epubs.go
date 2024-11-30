@@ -11,20 +11,6 @@ import (
 	"github.com/vadim-ivlev/voiceover/pkg/html"
 )
 
-// Represens a text line ia a EPUB file
-type EpubTextLine struct {
-	// The text content of the line
-	Text string
-	// The line number in the file
-	Index int
-	// Path to the file in the EPUB
-	FilePath string
-	// Selector used to extract the text line
-	Selector string
-	// If the node has a child node
-	HasChild bool
-}
-
 // ListEpubFiles returns the content of the EPUB file treating it as a zip file
 //
 // Params:
@@ -69,7 +55,7 @@ func filterExtension(files []string, ext string) []string {
 	return filtered
 }
 
-// # listTranslatableFiles
+// # listProcessableFiles
 //
 // returns a slice of strings containing only the files that can be translated
 //
@@ -80,7 +66,7 @@ func filterExtension(files []string, ext string) []string {
 // Return:
 //
 //   - a list of file names with extensions .ncx, .xhtml, and .html
-func listTranslatableFiles(files []string) []string {
+func listProcessableFiles(files []string) []string {
 	translatableFiles := []string{}
 
 	ncxs := filterExtension(files, ".ncx")
@@ -172,7 +158,7 @@ func GetEpubTextLines(epubPath string) (epubTexts []EpubTextLine, err error) {
 		return
 	}
 
-	translatableFiles := listTranslatableFiles(files)
+	translatableFiles := listProcessableFiles(files)
 	epubTextLines := []EpubTextLine{}
 	for _, f := range translatableFiles {
 
@@ -181,7 +167,7 @@ func GetEpubTextLines(epubPath string) (epubTexts []EpubTextLine, err error) {
 			return nil, err
 		}
 
-		translatableEpubTextLines, err := fetchTranslatableLines(f, content)
+		translatableEpubTextLines, err := fetchProcessableLines(f, content)
 		if err != nil {
 			return nil, err
 		}
@@ -221,7 +207,7 @@ func fetchSelectorLines(epubPath, content, cssSelector string) (epubTextLines []
 	return epubTextLines, nil
 }
 
-// fetchTranslatableLines returns a slice of EpubTextLine objects representing the text content of the file with the specified name
+// fetchProcessableLines returns a slice of EpubTextLine objects representing the text content of the file with the specified name
 //
 // Params:
 //
@@ -231,7 +217,7 @@ func fetchSelectorLines(epubPath, content, cssSelector string) (epubTextLines []
 // Return:
 //
 //   - a slice of EpubTextLine objects and an error if any
-func fetchTranslatableLines(epubPath, content string) (epubTextLines []EpubTextLine, err error) {
+func fetchProcessableLines(epubPath, content string) (epubTextLines []EpubTextLine, err error) {
 	epubTextLines = []EpubTextLine{}
 
 	hEpubTextLines, err := fetchSelectorLines(epubPath, content, "h1, h2, h3, h4, h5, h6")

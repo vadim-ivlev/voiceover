@@ -2,10 +2,25 @@ package epubs
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
+	"github.com/vadim-ivlev/voiceover/internal/app"
+	"github.com/vadim-ivlev/voiceover/pkg/logger"
 	"github.com/vadim-ivlev/voiceover/pkg/utils"
 )
+
+func TestMain(m *testing.M) {
+	// No colors
+	logger.NoColor = true
+
+	// change directory to the root of the project
+	os.Chdir("../..")
+	app.InitLoggerSetParams()
+	fmt.Println("TestMain")
+
+	os.Exit(m.Run())
+}
 
 func TestListEpubFiles(t *testing.T) {
 	type args struct {
@@ -32,7 +47,7 @@ func TestListEpubFiles(t *testing.T) {
 				t.Errorf("ListEpubFiles() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			translatableFiles := listTranslatableFiles(got)
+			translatableFiles := listProcessableFiles(got)
 			fmt.Printf("translatableFiles = \n%s\n", utils.PrettyJSON(translatableFiles))
 
 			ncxContent, err := getFileContent(tt.args.epubPath, translatableFiles[0])
