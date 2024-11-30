@@ -15,6 +15,12 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+type SelectorTextLine struct {
+	Selector    string
+	Text        string
+	HasChildren bool
+}
+
 // FetchSelectorTextsFromHTML extracts lines of text from HTML content.
 // Each line of text is the text content of an HTML element selected by the provided CSS selector.
 // The text lines are returned in the order of appearance in the HTML content.
@@ -34,6 +40,10 @@ func FetchSelectorTextsFromHTML(htmlContent, cssSelector string) (textLines []st
 	// Find elements matching the CSS selector and extract their text content
 	doc.Find(cssSelector).Each(func(i int, s *goquery.Selection) {
 		textLines = append(textLines, s.Text())
+		//check s has children
+		if s.Children().Length() > 0 {
+			fmt.Println("s has children")
+		}
 	})
 	return textLines, nil
 }

@@ -19,6 +19,10 @@ type EpubTextLine struct {
 	Index int
 	// Path to the file in the EPUB
 	FilePath string
+	// Selector used to extract the text line
+	Selector string
+	// If the node has a child node
+	HasChild bool
 }
 
 // ListEpubFiles returns the content of the EPUB file treating it as a zip file
@@ -211,6 +215,7 @@ func fetchSelectorLines(epubPath, content, cssSelector string) (epubTextLines []
 			Text:     text,
 			Index:    i,
 			FilePath: epubPath,
+			Selector: cssSelector,
 		})
 	}
 	return epubTextLines, nil
@@ -227,14 +232,19 @@ func fetchSelectorLines(epubPath, content, cssSelector string) (epubTextLines []
 //
 //   - a slice of EpubTextLine objects and an error if any
 func fetchTranslatableLines(epubPath, content string) (epubTextLines []EpubTextLine, err error) {
-	pEpubTextLines, err := fetchSelectorLines(epubPath, content, "p")
-	if err != nil {
-		return nil, err
-	}
+	epubTextLines = []EpubTextLine{}
+
 	hEpubTextLines, err := fetchSelectorLines(epubPath, content, "h1, h2, h3, h4, h5, h6")
 	if err != nil {
 		return nil, err
 	}
-	epubTextLines = append(pEpubTextLines, hEpubTextLines...)
+	epubTextLines = append(epubTextLines, hEpubTextLines...)
+
+	pEpubTextLines, err := fetchSelectorLines(epubPath, content, "p")
+	if err != nil {
+		return nil, err
+	}
+	epubTextLines = append(epubTextLines, pEpubTextLines...)
+
 	return epubTextLines, nil
 }
