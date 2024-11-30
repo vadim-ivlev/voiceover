@@ -45,3 +45,32 @@ func TestListEpubFiles(t *testing.T) {
 		})
 	}
 }
+
+func TestGetEpubTextLines(t *testing.T) {
+	type args struct {
+		epubPath string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "GetEpubTextLines",
+			args: args{
+				epubPath: "texts/dahl.epub",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotEpubTexts, err := GetEpubTextLines(tt.args.epubPath)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetEpubTextLines() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			fmt.Printf("gotEpubTexts = \n%s\n", utils.PrettyJSON(gotEpubTexts[0:10]))
+		})
+	}
+}

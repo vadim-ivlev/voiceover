@@ -1,4 +1,4 @@
-package epubs
+package html
 
 import (
 	"fmt"
