@@ -18,6 +18,8 @@ import (
 type HtmlTextLine struct {
 	// The text content of the line
 	Text string
+	// HTML text of the line
+	Html string
 	// The line number in the file
 	Index int
 	// Selector used to extract the text line
@@ -105,23 +107,34 @@ func UpdateHTMLWithSelectorEpubTextLines(htmlContent, cssSelector string, htmlTe
 
 	// and replace their text content with the provided text lines
 	for _, line := range htmlTextLines {
-		idx := line.Index
-		text := line.Text
+
 		selector := line.Selector
-		if idx < elements.Length() {
-			// If the selector of the text line does not match the CSS selector,
-			if selector != cssSelector {
-				continue
-			}
-			// find the element at the specified index
-			selectedElement := elements.Eq(idx)
-			// set the text content of the element
-			selectedElement.SetText(text)
+		// If the selector of the text line does not match the CSS selector,
+		if selector != cssSelector {
+			continue
 		}
+
+		text := strings.TrimSpace(line.Text)
+		// if text is empty, skip the update
+		if text == "" {
+			continue
+		}
+
+		idx := line.Index
+		// if the index is out of the range of elements, skip the update
+		if idx >= elements.Length() || idx < 0 {
+			continue
+		}
+
+		// find the element at the specified index
+		selectedElement := elements.Eq(idx)
+		// set the text content of the element
+		selectedElement.SetText(text)
+		// TODO: selectedElement.SetHtml(text)
 	}
 
-	// Serialize the modified HTML content
 	modifiedHTML, err = doc.Html()
+
 	return modifiedHTML, err
 }
 
