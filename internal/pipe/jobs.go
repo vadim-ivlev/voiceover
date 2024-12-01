@@ -56,6 +56,10 @@ type Job struct {
 		Text string `json:"text"`
 		// Translated text
 		TranslatedText string `json:"translated_text"`
+		// HTML text
+		Html string `json:"html"`
+		// Translated HTML text
+		TranslatedHtml string `json:"translated_html"`
 		// Voice
 		Voice string `json:"voice"`
 		// Text file

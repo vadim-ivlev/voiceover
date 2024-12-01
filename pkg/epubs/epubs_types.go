@@ -6,6 +6,11 @@ package epubs
 type EpubTextLine struct {
 	// The text content of the line
 	Text string
+	// HTML text of the line
+	Html string
+	// The index of the line in the HTML content
+	htmlTextLineIndex int
+
 	// The line number in the file
 	Index int
 	// Path to the file in the EPUB

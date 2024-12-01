@@ -34,21 +34,29 @@ type HtmlTextLine struct {
 // - cssSelector: the CSS selector to select the HTML elements to extract text from.
 // For example, "p", "h1", "h2", "h3", "div", "span", etc.
 // Returns:
-// - textLines: the extracted text lines.
+// - textLines: the extracted HTML text lines.
 // - err: an error if the extraction failed.
-func FetchSelectorTextsFromHTML(htmlContent, cssSelector string) (textLines []string, err error) {
+func FetchSelectorTextsFromHTML(htmlContent, cssSelector string) (textLines []HtmlTextLine, err error) {
 	// Parse the HTML content
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
 	if err != nil {
 		return nil, err
 	}
+
 	// Find elements matching the CSS selector and extract their text content
 	doc.Find(cssSelector).Each(func(i int, s *goquery.Selection) {
-		textLines = append(textLines, s.Text())
-		// //check s has children
-		// if s.Children().Length() > 0 {
-		// 	fmt.Println("s has children")
-		// }
+		html, err := s.Html()
+		if err != nil {
+			fmt.Printf("Failed to get HTML content for element %d:  %v\n", i, err)
+		}
+
+		htmlTextLine := HtmlTextLine{
+			Text:     s.Text(),
+			Html:     html,
+			Index:    i,
+			Selector: cssSelector,
+		}
+		textLines = append(textLines, htmlTextLine)
 	})
 	return textLines, nil
 }
@@ -136,42 +144,4 @@ func UpdateHTMLWithSelectorEpubTextLines(htmlContent, cssSelector string, htmlTe
 	modifiedHTML, err = doc.Html()
 
 	return modifiedHTML, err
-}
-
-// Example usage
-func usageExample() {
-	htmlContent := `
-        <html>
-		<!-- This is a comment -->
-            <body>
-				<h1>Heading 1</h1>
-                <h2>Heading 2</h2>
-				<p></p>
-				<p>  </p>
-                <p>Paragraph 1 </p>
-                <p>  Paragraph 2</p>
-				<p><span>span</span></p>
-            </body>
-        </html>
-    `
-	cssSelector := "p"
-
-	// Extract text lines from the HTML content
-	textLines, err := FetchSelectorTextsFromHTML(htmlContent, cssSelector)
-	if err != nil {
-		fmt.Println("Failed to extract text lines from HTML content:", err)
-		return
-	}
-	fmt.Printf("Extracted text lines: \n%#v\n", textLines)
-
-	// Define new text lines to replace the existing ones
-	modifiedTextLines := []string{"", "  ", "NEW paragraph 1", "NEW paragraph 2", "NEW span", "NEW paragraph 3"}
-
-	// Modify the HTML content with the new text lines
-	modifiedHTML, err := UpdateHTMLWithSelectorTexts(htmlContent, cssSelector, modifiedTextLines)
-	if err != nil {
-		fmt.Println("Failed to modify HTML content with text lines:", err)
-		return
-	}
-	fmt.Printf("Modified HTML content:\n%v\n", modifiedHTML)
 }

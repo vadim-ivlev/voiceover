@@ -229,17 +229,19 @@ func GetEpubTextLines(epubPath string, startIndex, endIndex int, selectors []str
 //
 //   - a slice of EpubTextLine objects and an error if any
 func fetchSelectorLines(epubPath, content, cssSelector string) (epubTextLines []EpubTextLine, err error) {
-	texts, err := html.FetchSelectorTextsFromHTML(content, cssSelector)
+	htmlTextLines, err := html.FetchSelectorTextsFromHTML(content, cssSelector)
 	if err != nil {
 		return nil, err
 	}
 	epubTextLines = []EpubTextLine{}
-	for i, text := range texts {
+	for i, htmlTextLine := range htmlTextLines {
 		epubTextLines = append(epubTextLines, EpubTextLine{
-			Text:     text,
-			Index:    i,
-			FilePath: epubPath,
-			Selector: cssSelector,
+			Text:              htmlTextLine.Text,
+			Html:              htmlTextLine.Html,
+			htmlTextLineIndex: htmlTextLine.Index,
+			Index:             i,
+			FilePath:          epubPath,
+			Selector:          cssSelector,
 		})
 	}
 	return epubTextLines, nil

@@ -56,6 +56,7 @@ func getTextOperation(textLines []epubs.EpubTextLine) JobFunction {
 		}
 		job.Results.Epub = textLines[job.ID]
 		job.Results.Text = strings.TrimSpace(textLines[job.ID].Text)
+		job.Results.Html = textLines[job.ID].Html
 		return job, nil
 	}
 }
