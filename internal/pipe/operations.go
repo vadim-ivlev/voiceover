@@ -112,15 +112,26 @@ func toArray(jobsChan chan Job) []Job {
 
 // DoPipeline - starts the pipeline processing.
 // Parameters:
-// textLines: the text lines to process
+//   - task: the task to process
+//
 // Returns:
-// an array of processed jobs
-// an error if any
-func DoPipeline(textLines []string, task Task) (doneJobs []Job, err error) {
+//   - an array of processed jobs
+//   - the number of jobs
+//   - the base name of the output files
+//   - an error if any
+func DoPipeline(task Task) (doneJobs []Job, numJobs int, outputBaseName string, err error) {
 
-	numLines := len(textLines)
+	// Get text lines from the input fil
+	textLines, start, end, err := texts.GetTextFileLines(config.Params.InputFileName, config.Params.Start, config.Params.End)
+	if err != nil {
+		return
+	}
+	// calculate a base file name for the output file
+	outputBaseName = fmt.Sprintf("%s.lines-%06d-%06d", config.Params.OutputFileName, start, end)
 
-	jobs := newJobsArray(numLines)
+	numJobs = len(textLines)
+
+	jobs := newJobsArray(numJobs)
 	loadPreviuosJobs(jobs, task)
 
 	// Create channels to pass the jobs between the workers
@@ -128,7 +139,7 @@ func DoPipeline(textLines []string, task Task) (doneJobs []Job, err error) {
 	textChan := make(chan Job)
 	translChan := make(chan Job)
 	// soundChan must be buffered because its jobs will be sorted after it is closed
-	soundChan := make(chan Job, numLines)
+	soundChan := make(chan Job, numJobs)
 
 	// Fill the jobs channel with the jobs from a newly created array
 	go toChannel(jobs, jobsChan)
@@ -145,7 +156,7 @@ func DoPipeline(textLines []string, task Task) (doneJobs []Job, err error) {
 
 	// gatther the jobs into an array. Fan-in.
 	doneJobs = toArray(soundChan)
-	return doneJobs, nil
+	return doneJobs, numJobs, outputBaseName, nil
 }
 
 // CreateFileList - creates a file list of audio files for concatenation with ffmpeg

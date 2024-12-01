@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/vadim-ivlev/voiceover/internal/config"
 	"github.com/vadim-ivlev/voiceover/pkg/texts"
 	"github.com/vadim-ivlev/voiceover/pkg/utils"
 )
@@ -21,24 +20,11 @@ func ProcessFile() (outMP3File, outTextFile, outTaskFile string, numDone int, er
 		return
 	}
 
-	// Get text lines from the input fil
-	// TODO: move inside the DoPipeline function
-	textLines, start, end, err := texts.GetTextFileLines(config.Params.InputFileName, config.Params.Start, config.Params.End)
+	// PROCESS PROCESS PROCESS PROCESS the jobs in the pipeline -----------------
+	processedJobs, numJobs, outputBaseName, err := DoPipeline(task)
 	if err != nil {
 		return
 	}
-	// calculate a base file name for the output file
-	outputBaseName := fmt.Sprintf("%s.lines-%06d-%06d", config.Params.OutputFileName, start, end)
-
-	// return nil
-
-	// HERE: process the jobs in the pipeline -----------------
-	processedJobs, err := DoPipeline(textLines, task)
-	if err != nil {
-		return
-	}
-
-	numDone = len(processedJobs)
 
 	outMP3File, err = CreateOutputMP3(processedJobs, outputBaseName)
 	if err != nil {
@@ -56,9 +42,8 @@ func ProcessFile() (outMP3File, outTextFile, outTaskFile string, numDone int, er
 	task.Jobs = processedJobs
 	task.Results.SoundFile = outMP3File
 	task.Results.TextFile = outTextFile
-	// TODO: move inside the DoPipeline function
-	if numDone != len(textLines) {
-		task.TaskErrors = fmt.Sprintf("Only %d of %d paragraphs processed.", numDone, len(textLines))
+	if len(processedJobs) != numJobs {
+		task.TaskErrors = fmt.Sprintf("Only %d of %d jobs processed.", len(processedJobs), numJobs)
 	}
 
 	outTaskFile = outputBaseName + ".task.json"
