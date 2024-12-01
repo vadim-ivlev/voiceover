@@ -235,6 +235,7 @@ func epubToHtmlTextLines(epubTextLines []EpubTextLine) []html.HtmlTextLine {
 	for i, epubLine := range epubTextLines {
 		htmlTextLines[i] = html.HtmlTextLine{
 			Text:     epubLine.Text,
+			Html:     epubLine.Html,
 			Index:    epubLine.Index,
 			Selector: epubLine.Selector,
 		}

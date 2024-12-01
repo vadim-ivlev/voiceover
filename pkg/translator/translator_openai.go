@@ -48,7 +48,7 @@ curl https://api.openai.com/v1/chat/completions \
 
 */
 
-var TranslatorInstructions = `
+var TextTranslInstructions = `
 1. Translate the text provided by the user into %s.
 Make the text easier to read.
 
@@ -66,17 +66,39 @@ Clarity and Simplicity
 3. Eliminate unnecessary adverbs and rearrange adjectives in accord with %s norms.
 `
 
+var HtmlTranslInstructions = `
+1. Translate the text provided by the user into %s.
+Make the text easier to read.
+
+2. Transform every sentence according to the following  key principles:
+
+Clarity and Simplicity
+
+	•	Use clear and concise language.
+	•	Avoid jargon, overly complex sentences, and unnecessary words.
+	•	Prefer plain language over complicated or obscure vocabulary.
+	•	Use active voice whenever possible,.
+	•	Avoid vague terms and redundant phrases.
+
+
+3. Eliminate unnecessary adverbs and rearrange adjectives in accord with %s norms.
+
+4. If there are any inner tags such as <span>, <a> or <small> , try to keep tags in place. Preserve both the formatting and the semantic flow. 
+
+`
+
 // TranslateText translates the text using OpenAI API
 // and returns the translated text.
 // Parameters:
 // - apiURL: the URL of the OpenAI API
 // - apiKey: the API key for the OpenAI API
 // - language: the language to translate the text into
+// - instructions: the instructions for the translation
 // - text: the text to translate
 // Returns:
 // - translation: the translated text
-func TranslateText(apiURL, apiKey, language, text string) (translation string, err error) {
-	systemMessage := fmt.Sprintf(TranslatorInstructions, language, language)
+func TranslateText(apiURL, apiKey, language, instructions, text string) (translation string, err error) {
+	systemMessage := fmt.Sprintf(instructions, language, language)
 	requestBody := map[string]interface{}{
 		"model": "gpt-4o",
 		"messages": []map[string]interface{}{
@@ -90,10 +112,6 @@ func TranslateText(apiURL, apiKey, language, text string) (translation string, e
 			},
 		},
 		"temperature": 1,
-
-		// "top_p":             1,
-		// "frequency_penalty": 0,
-		// "presence_penalty":  0,
 	}
 
 	jsonData, err := json.MarshalIndent(requestBody, "", "  ")

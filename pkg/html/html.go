@@ -134,11 +134,13 @@ func UpdateHTMLWithSelectorEpubTextLines(htmlContent, cssSelector string, htmlTe
 			continue
 		}
 
+		html := line.Html
+
 		// find the element at the specified index
 		selectedElement := elements.Eq(idx)
 		// set the text content of the element
-		selectedElement.SetText(text)
-		// TODO: selectedElement.SetHtml(text)
+		// selectedElement.SetText(text)
+		selectedElement.SetHtml(html)
 	}
 
 	modifiedHTML, err = doc.Html()

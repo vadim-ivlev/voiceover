@@ -70,12 +70,21 @@ func translateTextOperation(job Job) (Job, error) {
 	}
 
 	// translate the text
-	translatedText, err := translator.TranslateText(config.Params.OpenaiAPIURL, config.Params.ApiKey, config.Params.TranslateTo, job.Results.Text)
+	translatedText, err := translator.TranslateText(config.Params.OpenaiAPIURL, config.Params.ApiKey, config.Params.TranslateTo, translator.TextTranslInstructions, job.Results.Text)
 	if err != nil {
 		return job, err
 	}
 	// save the translated text to the job
 	job.Results.TranslatedText = translatedText
+
+	// translate the html
+	TranslatedHtml, err := translator.TranslateText(config.Params.OpenaiAPIURL, config.Params.ApiKey, config.Params.TranslateTo, translator.HtmlTranslInstructions, job.Results.Html)
+	if err != nil {
+		return job, err
+	}
+	// save the translated text to the job
+	job.Results.TranslatedHtml = TranslatedHtml
+
 	return job, nil
 }
 
@@ -262,6 +271,7 @@ func CreateOutputEpub(inputEpubFile string, processedJobs []Job, outputBaseName 
 	for _, job := range processedJobs {
 		line := job.Results.Epub
 		line.Text = job.Results.TranslatedText
+		line.Html = job.Results.TranslatedHtml
 		epubLines = append(epubLines, line)
 	}
 
