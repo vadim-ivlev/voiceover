@@ -136,37 +136,23 @@ func toArray(jobsChan chan Job) []Job {
 //   - an error if any
 func DoPipeline(task Task) (doneJobs []Job, numJobs int, outputBaseName string, err error) {
 
-	textLines := []epubs.EpubTextLine{}
-	start := 0
-	end := 0
-
-	// check the inpjut file extension
-	if path.Ext(config.Params.InputFileName) == ".epub" {
-		textLines, start, end, err = epubs.GetEpubTextLines(config.Params.InputFileName, config.Params.Start, config.Params.End, epubs.ProcessableSelectors)
-		if err != nil {
-			return
-		}
-	} else {
-		// textLines, start, end, err = texts.GetTextFileLines(config.Params.InputFileName, config.Params.Start, config.Params.End)
-		textLines, start, end, err = getEpubTextLinesFromTextFile(config.Params.InputFileName, config.Params.Start, config.Params.End)
-		if err != nil {
-			return
-		}
+	// get slice of epub text lines and the base name for the output files
+	epubTextLines, outputBaseName, err := getEpubTextLines()
+	if err != nil {
+		return
 	}
 
-	// calculate a base file name for the output file
-	outputBaseName = fmt.Sprintf("%s.lines-%06d-%06d", config.Params.OutputFileName, start, end)
+	numJobs = len(epubTextLines)
 
-	numJobs = len(textLines)
-
+	// create an array of jobs
 	jobs := newJobsArray(numJobs)
-
+	// load the previous jobs to the new jobs array
 	loadPreviuosJobs(jobs, task)
 
 	// Create channels to pass the jobs between the workers
-	jobsChan := make(chan Job)
-	textChan := make(chan Job)
-	translChan := make(chan Job)
+	jobsChan := make(chan Job, numJobs)
+	textChan := make(chan Job, numJobs)
+	translChan := make(chan Job, numJobs)
 	// soundChan must be buffered because its jobs will be sorted after it is closed
 	soundChan := make(chan Job, numJobs)
 
@@ -174,11 +160,12 @@ func DoPipeline(task Task) (doneJobs []Job, numJobs int, outputBaseName string, 
 	go toChannel(jobs, jobsChan)
 
 	// add a text to each job and assign a voice
-	// doTeamWork(1, "T", getTextOperation(textLines), jobsChan, textChan)
-	go DoWork(nil, "Text", "T", getTextOperation(textLines), jobsChan, textChan)
+	// doTeamWork(4, "Text", "T", getTextOperation(epubTextLines), jobsChan, textChan)
+	go DoWork(nil, "Add Text", "T", getTextOperation(epubTextLines), jobsChan, textChan)
 
 	// translate the text.
-	go DoWork(nil, "Translate", "Tr", translateTextOperation, textChan, translChan)
+	// go DoWork(nil, "Translate", "Tr", translateTextOperation, textChan, translChan)
+	doTeamWork(10, "Translate", "Tr", translateTextOperation, textChan, translChan)
 
 	// generate sound file for each job. Fan-out.
 	doTeamWork(10, "Sound", "S", soundOperation, translChan, soundChan)
@@ -336,5 +323,36 @@ func getEpubTextLinesFromTextFile(fileName string, startIndex, endIndex int) (ep
 			Selector: "",
 		})
 	}
+	return
+}
+
+// getEpubTextLines extracts text lines from an EPUB file or a plain text file
+// based on the input file extension and specified start and end positions.
+// It returns the extracted text lines, a base name for the output file, and an error if any.
+//
+// Returns:
+// - epubTextLines: A slice of EpubTextLine containing the extracted text lines.
+// - outputBaseName: A string representing the base name for the output file.
+// - err: An error if any occurred during the extraction process.
+func getEpubTextLines() (epubTextLines []epubs.EpubTextLine, outputBaseName string, err error) {
+	// epubTextLines = []epubs.EpubTextLine{}
+	start := 0
+	end := 0
+
+	// check the inpjut file extension
+	if path.Ext(config.Params.InputFileName) == ".epub" {
+		epubTextLines, start, end, err = epubs.GetEpubTextLines(config.Params.InputFileName, config.Params.Start, config.Params.End, epubs.ProcessableSelectors)
+		if err != nil {
+			return
+		}
+	} else {
+		// textLines, start, end, err = texts.GetTextFileLines(config.Params.InputFileName, config.Params.Start, config.Params.End)
+		epubTextLines, start, end, err = getEpubTextLinesFromTextFile(config.Params.InputFileName, config.Params.Start, config.Params.End)
+		if err != nil {
+			return
+		}
+	}
+	// calculate a base file name for the output file
+	outputBaseName = fmt.Sprintf("%s.lines-%06d-%06d", config.Params.OutputFileName, start, end)
 	return
 }
