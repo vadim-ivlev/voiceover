@@ -3,11 +3,11 @@ package texts
 import (
 	"bufio"
 	"bytes" // added
-	"fmt"
 	"os"
 	"strings"
 
 	"github.com/rs/zerolog/log"
+	"github.com/vadim-ivlev/voiceover/pkg/utils"
 )
 
 var splitString = "\n"
@@ -96,30 +96,14 @@ func GetTextFileLines(fileName string, startIndex, endIndex int) (lines []string
 	if err != nil {
 		return nil, 0, 0, err
 	}
-	totalLines := len(allLines)
 
-	// adjust the end index
-	if endIndex < 0 {
-		endIndex = 0
-	}
-	if endIndex > totalLines {
-		endIndex = totalLines
-	}
-
-	// adjust the start index
-	if startIndex < 0 {
-		startIndex = 0
-	}
-	if startIndex >= totalLines {
-		return nil, startIndex, endIndex, fmt.Errorf("start index %d is greater than or equal to the total number of lines %d", startIndex, totalLines)
-	}
-
-	// check if the start index is greater than the end index
-	if startIndex >= endIndex {
-		return nil, startIndex, endIndex, fmt.Errorf("start index %d is greater than or equal to the end index %d", startIndex, endIndex)
+	// calculate the start and end indexes
+	start, end, err = utils.CalcStartEndIndex(len(allLines), startIndex, endIndex)
+	if err != nil {
+		return nil, 0, 0, err
 	}
 
 	// get the lines
-	lines = allLines[startIndex:endIndex]
-	return lines, startIndex, endIndex, nil
+	lines = allLines[start:end]
+	return lines, start, end, nil
 }
