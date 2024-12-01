@@ -9,6 +9,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/vadim-ivlev/voiceover/internal/config"
+	"github.com/vadim-ivlev/voiceover/pkg/epubs"
 	"github.com/vadim-ivlev/voiceover/pkg/utils"
 )
 
@@ -49,14 +50,7 @@ type Job struct {
 	ID      int `json:"id"`
 	Results struct {
 		// EPUB properties
-
-		// Path to the processed file inside the EPUB
-		EpubInnerPath string `json:"epub_inner_path"`
-		// EPUB selector
-		EpubChunkSelector string `json:"epub_chunk_selector"`
-		// EPUB index of the chunk selected by the selector
-		EpubChunkIndex int `json:"epub_chunk_index"`
-
+		Epub epubs.EpubTextLine `json:"epub"`
 		// Text to process
 		Text string `json:"text"`
 		// Translated text

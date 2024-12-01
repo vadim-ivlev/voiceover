@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path"
 	"sort"
 	"strings"
 	"time"
@@ -11,6 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/vadim-ivlev/voiceover/internal/audio"
 	"github.com/vadim-ivlev/voiceover/internal/config"
+	"github.com/vadim-ivlev/voiceover/pkg/epubs"
 	"github.com/vadim-ivlev/voiceover/pkg/sound"
 	"github.com/vadim-ivlev/voiceover/pkg/texts"
 	"github.com/vadim-ivlev/voiceover/pkg/translator"
@@ -33,14 +35,27 @@ func LogJob(job Job, msg string) {
 	// log.Info().Msg(job.String())
 }
 
-// getTextJobOperation - returns the textJob operation
-func getTextOperation(textLines []string) JobFunction {
+// getTextJobOperation0 - returns the textJob operation
+func getTextOperation0(textLines []string) JobFunction {
 	// adds text to the job, and assigns a voice
 	return func(job Job) (Job, error) {
 		if len(textLines) < job.ID+1 {
 			return job, fmt.Errorf("Job %d: No text for the job", job.ID)
 		}
 		job.Results.Text = strings.TrimSpace(textLines[job.ID])
+		return job, nil
+	}
+}
+
+// getTextJobOperation - returns the textJob operation
+func getTextOperation(textLines []epubs.EpubTextLine) JobFunction {
+	// adds text to the job, and assigns a voice
+	return func(job Job) (Job, error) {
+		if len(textLines) < job.ID+1 {
+			return job, fmt.Errorf("Job %d: No text for the job", job.ID)
+		}
+		job.Results.Epub = textLines[job.ID]
+		job.Results.Text = strings.TrimSpace(textLines[job.ID].Text)
 		return job, nil
 	}
 }
@@ -121,17 +136,31 @@ func toArray(jobsChan chan Job) []Job {
 //   - an error if any
 func DoPipeline(task Task) (doneJobs []Job, numJobs int, outputBaseName string, err error) {
 
-	// Get text lines from the input fil
-	textLines, start, end, err := texts.GetTextFileLines(config.Params.InputFileName, config.Params.Start, config.Params.End)
-	if err != nil {
-		return
+	textLines := []epubs.EpubTextLine{}
+	start := 0
+	end := 0
+
+	// check the inpjut file extension
+	if path.Ext(config.Params.InputFileName) == ".epub" {
+		textLines, start, end, err = epubs.GetEpubTextLines(config.Params.InputFileName, config.Params.Start, config.Params.End, epubs.ProcessableSelectors)
+		if err != nil {
+			return
+		}
+	} else {
+		// textLines, start, end, err = texts.GetTextFileLines(config.Params.InputFileName, config.Params.Start, config.Params.End)
+		textLines, start, end, err = getEpubTextLinesFromTextFile(config.Params.InputFileName, config.Params.Start, config.Params.End)
+		if err != nil {
+			return
+		}
 	}
+
 	// calculate a base file name for the output file
 	outputBaseName = fmt.Sprintf("%s.lines-%06d-%06d", config.Params.OutputFileName, start, end)
 
 	numJobs = len(textLines)
 
 	jobs := newJobsArray(numJobs)
+
 	loadPreviuosJobs(jobs, task)
 
 	// Create channels to pass the jobs between the workers
@@ -246,4 +275,33 @@ func LoadJSONFile(fileName string, v any) (err error) {
 		return
 	}
 	return nil
+}
+
+// getEpubTextLinesFromTextFile reads lines from a text file and converts them into a slice of EpubTextLine structs.
+//
+// Parameters:
+//   - fileName: The name of the text file to read from.
+//   - startIndex: The starting index of the lines to read.
+//   - endIndex: The ending index of the lines to read.
+//
+// Returns:
+//   - epubTextLines: A slice of EpubTextLine structs containing the text lines and their metadata.
+//   - start: The actual starting index of the lines read.
+//   - end: The actual ending index of the lines read.
+//   - err: An error object if an error occurred while reading the file, otherwise nil.
+func getEpubTextLinesFromTextFile(fileName string, startIndex, endIndex int) (epubTextLines []epubs.EpubTextLine, start, end int, err error) {
+	epubTextLines = []epubs.EpubTextLine{}
+	lines, start, end, err := texts.GetTextFileLines(fileName, startIndex, endIndex)
+	if err != nil {
+		return
+	}
+	for i, line := range lines {
+		epubTextLines = append(epubTextLines, epubs.EpubTextLine{
+			Text:     line,
+			Index:    i,
+			FilePath: fileName,
+			Selector: "",
+		})
+	}
+	return
 }

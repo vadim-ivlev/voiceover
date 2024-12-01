@@ -4,11 +4,13 @@ import (
 	"archive/zip"
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
 	"github.com/vadim-ivlev/voiceover/pkg/html"
+	"github.com/vadim-ivlev/voiceover/pkg/utils"
 )
 
 // ListEpubFiles returns the content of the EPUB file treating it as a zip file
@@ -21,6 +23,11 @@ import (
 //
 //	a sorted list of file names within the EPUB and an error if any
 func ListEpubFiles(epubPath string) ([]string, error) {
+	// print current directory
+	dir, err := os.Getwd()
+	if err == nil {
+		fmt.Printf("Current directory: %s\n", dir)
+	}
 	r, err := zip.OpenReader(epubPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open EPUB file %s: %w", epubPath, err)
@@ -137,7 +144,7 @@ func readAll(r io.Reader) (string, error) {
 	return buf.String(), nil
 }
 
-// GetEpubTextLines extracts translatable text lines from an EPUB file.
+// GetAllEpubTextLines extracts all translatable text lines from an EPUB file.
 //
 // Parameters:
 //   - epubPath: The file path to the EPUB file.
@@ -153,7 +160,7 @@ func readAll(r io.Reader) (string, error) {
 //  3. Reads the content of each translatable file.
 //  4. Extracts the translatable text lines from the content.
 //  5. Returns a slice of EpubTextLine containing all the extracted text lines.
-func GetEpubTextLines(epubPath string, selectors []string) (epubTexts []EpubTextLine, err error) {
+func GetAllEpubTextLines(epubPath string, selectors []string) (epubTexts []EpubTextLine, err error) {
 	files, err := ListEpubFiles(epubPath)
 	if err != nil {
 		return
@@ -177,6 +184,36 @@ func GetEpubTextLines(epubPath string, selectors []string) (epubTexts []EpubText
 	}
 
 	return epubTextLines, nil
+}
+
+// GetEpubTextLines extracts a range of text lines from an EPUB file based on the provided start and end indexes and CSS selectors.
+//
+// Parameters:
+//   - epubPath: The file path to the EPUB file.
+//   - startIndex: The starting index of the text lines to extract.
+//   - endIndex: The ending index of the text lines to extract.
+//   - selectors: A slice of CSS selectors to filter the text lines.
+//
+// Returns:
+//   - epubTexts: A slice of EpubTextLine containing the extracted text lines.
+//   - start: The actual starting index used for extraction.
+//   - end: The actual ending index used for extraction.
+//   - err: An error object if an error occurred during the extraction process, otherwise nil.
+func GetEpubTextLines(epubPath string, startIndex, endIndex int, selectors []string) (epubTexts []EpubTextLine, start, end int, err error) {
+	allEpubTexts, err := GetAllEpubTextLines(epubPath, selectors)
+	if err != nil {
+		return nil, 0, 0, err
+	}
+
+	// calculate the start and end indexes
+	start, end, err = utils.CalcStartEndIndex(len(allEpubTexts), startIndex, endIndex)
+	if err != nil {
+		return nil, 0, 0, err
+	}
+
+	// get the lines
+	epubTexts = allEpubTexts[start:end]
+	return epubTexts, start, end, nil
 }
 
 // fetchSelectorLines returns a slice of EpubTextLine objects representing the text content of the HTML elements

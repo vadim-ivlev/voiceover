@@ -26,6 +26,8 @@ func ProcessFile() (outMP3File, outTextFile, outTaskFile string, numDone int, er
 		return
 	}
 
+	numDone = len(processedJobs)
+
 	outMP3File, err = CreateOutputMP3(processedJobs, outputBaseName)
 	if err != nil {
 		return

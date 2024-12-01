@@ -27,7 +27,22 @@
             "showLog": true
         },
         {
-            "name": "voiceover",
+            "name": "epub",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/cmd/voiceover/main.go",
+             "cwd": "${workspaceFolder}",
+            "args": [
+                "-s",
+                "90",
+                "-e",
+                "100",
+                "texts/dahl.epub"
+            ],
+        },
+        {
+            "name": "txt",
             "type": "go",
             "request": "launch",
             "mode": "auto",
@@ -43,7 +58,7 @@
             ],
         },
         {
-            "name": "voiceover-continue",
+            "name": "txt-continue",
             "type": "go",
             "request": "launch",
             "mode": "auto",

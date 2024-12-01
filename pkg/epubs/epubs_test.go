@@ -99,7 +99,7 @@ func TestGetEpubTextLines(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotEpubTexts, err := GetEpubTextLines(tt.args.epubPath, tt.args.selectors)
+			gotEpubTexts, err := GetAllEpubTextLines(tt.args.epubPath, tt.args.selectors)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetEpubTextLines() error = %v, wantErr %v", err, tt.wantErr)
 				return
