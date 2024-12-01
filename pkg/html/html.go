@@ -15,11 +15,14 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// type SelectorTextLine struct {
-// 	Selector    string
-// 	Text        string
-// 	HasChildren bool
-// }
+type HtmlTextLine struct {
+	// The text content of the line
+	Text string
+	// The line number in the file
+	Index int
+	// Selector used to extract the text line
+	Selector string
+}
 
 // FetchSelectorTextsFromHTML extracts lines of text from HTML content.
 // Each line of text is the text content of an HTML element selected by the provided CSS selector.
@@ -72,6 +75,50 @@ func UpdateHTMLWithSelectorTexts(htmlContent, cssSelector string, textLines []st
 			index++
 		}
 	})
+
+	// Serialize the modified HTML content
+	modifiedHTML, err = doc.Html()
+	return modifiedHTML, err
+}
+
+// UpdateHTMLWithSelectorEpubTextLines updates the text content of HTML elements
+// matching a given CSS selector with the provided text lines.
+//
+// Parameters:
+//   - htmlContent: The original HTML content as a string.
+//   - cssSelector: The CSS selector to find the elements to be updated.
+//   - textLines: A slice of HtmlTextLine structs containing the index and text
+//     to update the elements with.
+//
+// Returns:
+//   - modifiedHTML: The modified HTML content as a string.
+//   - err: An error if any occurred during the parsing or updating process.
+func UpdateHTMLWithSelectorEpubTextLines(htmlContent, cssSelector string, htmlTextLines []HtmlTextLine) (modifiedHTML string, err error) {
+	// Parse the HTML content
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
+	if err != nil {
+		return "", err
+	}
+
+	// Find elements matching the CSS selector
+	elements := doc.Find(cssSelector)
+
+	// and replace their text content with the provided text lines
+	for _, line := range htmlTextLines {
+		idx := line.Index
+		text := line.Text
+		selector := line.Selector
+		if idx < elements.Length() {
+			// If the selector of the text line does not match the CSS selector,
+			if selector != cssSelector {
+				continue
+			}
+			// find the element at the specified index
+			selectedElement := elements.Eq(idx)
+			// set the text content of the element
+			selectedElement.SetText(text)
+		}
+	}
 
 	// Serialize the modified HTML content
 	modifiedHTML, err = doc.Html()

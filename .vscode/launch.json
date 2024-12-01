@@ -35,9 +35,9 @@
             "cwd": "${workspaceFolder}",
             "args": [
                 "-s",
-                "90",
+                "19",
                 "-e",
-                "100",
+                "20",
                 "-translate",
                 "Russian",
                 "texts/dahl.epub"

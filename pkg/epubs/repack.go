@@ -213,13 +213,31 @@ func filerLinesBySelector(epubTextLines []EpubTextLine, selector string) []EpubT
 // This function uses the UpdateHTMLWithSelectorTexts function from the html package to update the HTML content.
 // Before calling the function, it extracts the text lines from the EpubTextLine structs and passes them to the function.
 func processContentBySelector(htmlContent, cssSelector string, epubTextLines []EpubTextLine) (modifiedHTML string) {
-	textLines := make([]string, len(epubTextLines))
-	for i, line := range epubTextLines {
-		textLines[i] = line.Text
-	}
-	modifiedHTML, err := html.UpdateHTMLWithSelectorTexts(htmlContent, cssSelector, textLines)
+	// Convert the HtmlTextLine slice from the EpubTextLine slice
+	htmlTextLines := epubToHtmlTextLines(epubTextLines)
+	modifiedHTML, err := html.UpdateHTMLWithSelectorEpubTextLines(htmlContent, cssSelector, htmlTextLines)
 	if err != nil {
 		return htmlContent
 	}
 	return modifiedHTML
+}
+
+// epubToHtmlTextLines converts a slice of EpubTextLine to a slice of html.HtmlTextLine.
+// Each EpubTextLine is mapped to an html.HtmlTextLine with the same Text, Index, and Selector fields.
+//
+// Parameters:
+//   - epubTextLines: A slice of EpubTextLine structs to be converted.
+//
+// Returns:
+//   - A slice of html.HtmlTextLine structs with the corresponding fields from the input slice.
+func epubToHtmlTextLines(epubTextLines []EpubTextLine) []html.HtmlTextLine {
+	htmlTextLines := make([]html.HtmlTextLine, len(epubTextLines))
+	for i, epubLine := range epubTextLines {
+		htmlTextLines[i] = html.HtmlTextLine{
+			Text:     epubLine.Text,
+			Index:    epubLine.Index,
+			Selector: epubLine.Selector,
+		}
+	}
+	return htmlTextLines
 }
