@@ -13,6 +13,7 @@ import (
 	"github.com/vadim-ivlev/voiceover/internal/audio"
 	"github.com/vadim-ivlev/voiceover/internal/config"
 	"github.com/vadim-ivlev/voiceover/pkg/epubs"
+	"github.com/vadim-ivlev/voiceover/pkg/html"
 	"github.com/vadim-ivlev/voiceover/pkg/sound"
 	"github.com/vadim-ivlev/voiceover/pkg/texts"
 	"github.com/vadim-ivlev/voiceover/pkg/translator"
@@ -69,21 +70,29 @@ func translateTextOperation(job Job) (Job, error) {
 		return job, nil
 	}
 
-	// translate the text
-	translatedText, err := translator.TranslateText(config.Params.OpenaiAPIURL, config.Params.ApiKey, config.Params.TranslateTo, translator.TextTranslInstructions, job.Results.Text)
-	if err != nil {
-		return job, err
-	}
-	// save the translated text to the job
-	job.Results.TranslatedText = translatedText
+	// // translate the text
+	// translatedText, err := translator.TranslateText(config.Params.OpenaiAPIURL, config.Params.ApiKey, config.Params.TranslateTo, translator.TextTranslInstructions, job.Results.Text)
+	// if err != nil {
+	// 	return job, err
+	// }
+	// // save the translated text to the job
+	// job.Results.TranslatedText = translatedText
 
 	// translate the html
 	TranslatedHtml, err := translator.TranslateText(config.Params.OpenaiAPIURL, config.Params.ApiKey, config.Params.TranslateTo, translator.HtmlTranslInstructions, job.Results.Html)
 	if err != nil {
 		return job, err
 	}
-	// save the translated text to the job
+	// save the translated html to the job
 	job.Results.TranslatedHtml = TranslatedHtml
+
+	// get translated text from the translated html
+	translatedText, err := html.GetTextFromHTML(TranslatedHtml)
+	if err != nil {
+		fmt.Printf("Failed to get text from HTML: %v\n", err)
+	}
+	// save the translated text to the job
+	job.Results.TranslatedText = translatedText
 
 	return job, nil
 }

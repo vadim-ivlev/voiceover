@@ -147,3 +147,23 @@ func UpdateHTMLWithSelectorEpubTextLines(htmlContent, cssSelector string, htmlTe
 
 	return modifiedHTML, err
 }
+
+// GetTextFromHTML extracts and returns the text content from the provided HTML string.
+//
+// Parameters:
+//   - htmlContent: A string containing the HTML content to be parsed.
+//
+// Returns:
+//   - text: A string containing the extracted text content from the HTML.
+//   - err: An error if there is an issue parsing the HTML content.
+func GetTextFromHTML(htmlContent string) (text string, err error) {
+	// Parse the HTML content
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
+	if err != nil {
+		return "", err
+	}
+
+	// Get the text content of the HTML document
+	text = doc.Text()
+	return text, nil
+}
