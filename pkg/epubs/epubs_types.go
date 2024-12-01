@@ -12,9 +12,9 @@ type EpubTextLine struct {
 	FilePath string
 	// Selector used to extract the text line
 	Selector string
-	// If the node has a child node
-	HasChild bool
+	// // If the node has a child node
+	// HasChildren bool
 }
 
 // ProcessableSelectors contains the list of selectors that can be processed.
-var ProcessableSelectors = []string{"p", "h1", "h2", "h3", "h4", "h5", "h6", "div", "span"}
+var ProcessableSelectors = []string{"h1", "h2", "h3", "h4", "h5", "h6", "p", "div"}

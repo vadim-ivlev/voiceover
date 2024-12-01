@@ -141,6 +141,7 @@ func readAll(r io.Reader) (string, error) {
 //
 // Parameters:
 //   - epubPath: The file path to the EPUB file.
+//   - selectors: A slice of CSS selectors used to identify the HTML elements to process.
 //
 // Returns:
 //   - epubTexts: A slice of EpubTextLine containing the translatable text lines from the EPUB file.
@@ -152,7 +153,7 @@ func readAll(r io.Reader) (string, error) {
 //  3. Reads the content of each translatable file.
 //  4. Extracts the translatable text lines from the content.
 //  5. Returns a slice of EpubTextLine containing all the extracted text lines.
-func GetEpubTextLines(epubPath string) (epubTexts []EpubTextLine, err error) {
+func GetEpubTextLines(epubPath string, selectors []string) (epubTexts []EpubTextLine, err error) {
 	files, err := ListEpubFiles(epubPath)
 	if err != nil {
 		return
@@ -167,7 +168,7 @@ func GetEpubTextLines(epubPath string) (epubTexts []EpubTextLine, err error) {
 			return nil, err
 		}
 
-		translatableEpubTextLines, err := fetchProcessableLines(f, content)
+		translatableEpubTextLines, err := fetchProcessableLines(f, content, selectors)
 		if err != nil {
 			return nil, err
 		}
@@ -213,24 +214,22 @@ func fetchSelectorLines(epubPath, content, cssSelector string) (epubTextLines []
 //
 //   - epubPath - the path to the file in the EPUB
 //   - content - the content of the file
+//   - selectors - the list of CSS selectors to select the HTML elements
 //
 // Return:
 //
 //   - a slice of EpubTextLine objects and an error if any
-func fetchProcessableLines(epubPath, content string) (epubTextLines []EpubTextLine, err error) {
+func fetchProcessableLines(epubPath, content string, selectors []string) (epubTextLines []EpubTextLine, err error) {
 	epubTextLines = []EpubTextLine{}
 
-	hEpubTextLines, err := fetchSelectorLines(epubPath, content, "h1, h2, h3, h4, h5, h6")
-	if err != nil {
-		return nil, err
+	// loop trough selectors to fetch text lines
+	for _, selector := range selectors {
+		lines, err := fetchSelectorLines(epubPath, content, selector)
+		if err != nil {
+			return nil, err
+		}
+		epubTextLines = append(epubTextLines, lines...)
 	}
-	epubTextLines = append(epubTextLines, hEpubTextLines...)
-
-	pEpubTextLines, err := fetchSelectorLines(epubPath, content, "p")
-	if err != nil {
-		return nil, err
-	}
-	epubTextLines = append(epubTextLines, pEpubTextLines...)
 
 	return epubTextLines, nil
 }

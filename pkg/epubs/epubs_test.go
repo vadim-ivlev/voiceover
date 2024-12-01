@@ -2,6 +2,7 @@ package epubs
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"testing"
 
@@ -63,7 +64,8 @@ func TestListEpubFiles(t *testing.T) {
 
 func TestGetEpubTextLines(t *testing.T) {
 	type args struct {
-		epubPath string
+		epubPath  string
+		selectors []string
 	}
 	tests := []struct {
 		name    string
@@ -71,21 +73,40 @@ func TestGetEpubTextLines(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "GetEpubTextLines",
+			name: "GetEpubTextLines h1",
 			args: args{
-				epubPath: "texts/dahl.epub",
+				epubPath:  "texts/dahl.epub",
+				selectors: []string{"h1"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "GetEpubTextLines h2",
+			args: args{
+				epubPath:  "texts/dahl.epub",
+				selectors: []string{"h2"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "GetEpubTextLines p",
+			args: args{
+				epubPath:  "texts/dahl.epub",
+				selectors: []string{"P"},
 			},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotEpubTexts, err := GetEpubTextLines(tt.args.epubPath)
+			gotEpubTexts, err := GetEpubTextLines(tt.args.epubPath, tt.args.selectors)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetEpubTextLines() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			fmt.Printf("gotEpubTexts = \n%s\n", utils.PrettyJSON(gotEpubTexts[0:10]))
+			fmt.Printf("Number of EpubTextLines = %d\n", len(gotEpubTexts))
+			n := int(math.Min(3, float64(len(gotEpubTexts))))
+			fmt.Printf("gotEpubTexts = \n%s\n", utils.PrettyJSON(gotEpubTexts[0:n]))
 		})
 	}
 }
