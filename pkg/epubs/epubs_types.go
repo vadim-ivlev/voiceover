@@ -15,3 +15,6 @@ type EpubTextLine struct {
 	// If the node has a child node
 	HasChild bool
 }
+
+// ProcessableSelectors contains the list of selectors that can be processed.
+var ProcessableSelectors = []string{"p", "h1", "h2", "h3", "h4", "h5", "h6", "div", "span"}

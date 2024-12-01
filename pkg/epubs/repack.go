@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"os"
+
+	"github.com/vadim-ivlev/voiceover/pkg/html"
 )
 
 // RepackEpub repacks an existing EPUB file by copying its contents to a new EPUB file,
@@ -139,8 +141,75 @@ func processAndWrite(dest io.Writer, src io.Reader, epubPath string, epubTextLin
 //
 // Returns:
 //   - A string containing the processed content.
-func processContent(content, filePath string, epubTextLines []EpubTextLine) string {
-	// Implement the actual content processing logic here
-	// For now, just return the content unchanged
+func processContent(content, filePath string, epubTextLines []EpubTextLine) (processedContent string) {
+	// Filter lines for the current file
+	relevantLines := filterLinesByFilePath(epubTextLines, filePath)
+
+	// for each prcessable selector, modify the content
+	for _, selector := range ProcessableSelectors {
+		// Filter lines by selector
+		selectorLines := filerLinesBySelector(relevantLines, selector)
+		if len(selectorLines) > 0 {
+			//Update the content with the selector lines
+			content = processContentBySelector(content, selector, selectorLines)
+		}
+	}
+
 	return content
+}
+
+// filterLinesByFilePath filters the given slice of EpubTextLine and returns a new slice
+// containing only the lines that match the specified file path.
+//
+// Parameters:
+//   - epubTextLines: A slice of EpubTextLine structs to be filtered.
+//   - filePath: The file path to filter the lines by.
+//
+// Returns:
+//
+//	A slice of EpubTextLine structs that have the specified file path.
+func filterLinesByFilePath(epubTextLines []EpubTextLine, filePath string) []EpubTextLine {
+	var filteredLines []EpubTextLine
+	for _, line := range epubTextLines {
+		if line.FilePath == filePath {
+			filteredLines = append(filteredLines, line)
+		}
+	}
+	return filteredLines
+}
+
+func filerLinesBySelector(epubTextLines []EpubTextLine, selector string) []EpubTextLine {
+	var filteredLines []EpubTextLine
+	for _, line := range epubTextLines {
+		if line.Selector == selector {
+			filteredLines = append(filteredLines, line)
+		}
+	}
+	return filteredLines
+}
+
+// processContentBySelector processes the given HTML content by updating elements
+// that match the specified CSS selector with the provided text lines.
+//
+// Parameters:
+//   - htmlContent: The original HTML content to be modified.
+//   - cssSelector: The CSS selector used to identify elements in the HTML content.
+//   - epubTextLines: A slice of EpubTextLine structs containing the text lines to be inserted.
+//
+// Returns:
+//   - modifiedHTML: The modified HTML content with the text lines inserted. If an error occurs
+//     during the update, the original HTML content is returned.
+//
+// This function uses the UpdateHTMLWithSelectorTexts function from the html package to update the HTML content.
+// Before calling the function, it extracts the text lines from the EpubTextLine structs and passes them to the function.
+func processContentBySelector(htmlContent, cssSelector string, epubTextLines []EpubTextLine) (modifiedHTML string) {
+	textLines := make([]string, len(epubTextLines))
+	for i, line := range epubTextLines {
+		textLines[i] = line.Text
+	}
+	modifiedHTML, err := html.UpdateHTMLWithSelectorTexts(htmlContent, cssSelector, textLines)
+	if err != nil {
+		return htmlContent
+	}
+	return modifiedHTML
 }
