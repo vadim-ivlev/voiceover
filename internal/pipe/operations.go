@@ -261,6 +261,39 @@ func CreateOutputText(processedJobs []Job, outputBaseName string) (outTextFile s
 	return
 }
 
+// CreateOutputEpub - joins the processed jobs into one epub file.
+func CreateOutputEpub(inputEpubFile string, processedJobs []Job, outputBaseName string) (outEpubFile string, err error) {
+	// remove the output text file if it exists
+	err = os.Remove(outputBaseName + ".epub")
+	if err != nil {
+		log.Info().Msgf("Failed to delete the output file: %v", err)
+	}
+
+	// get the text lines from the processed jobs
+	epubLines := []epubs.EpubTextLine{}
+	for _, job := range processedJobs {
+		line := job.Results.Epub
+		line.Text = job.Results.TranslatedText
+		epubLines = append(epubLines, line)
+	}
+
+	// write an epub file with processed lines
+	outEpubFile = outputBaseName + ".epub"
+
+	if inputEpubFile == outEpubFile {
+		err = fmt.Errorf("input and output files are the same: %s", inputEpubFile)
+		return
+	}
+
+	// err = epubs.SaveEpubTextLines(outEpubFile, epubLines)
+	err = epubs.RepackEpub(inputEpubFile, outEpubFile, epubLines)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 // LoadJSONFile - loads a JSON file into a structure
 // Parameters:
 // fileName: the name of the file

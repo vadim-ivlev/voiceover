@@ -27,6 +27,7 @@ type Task struct {
 	Results   struct {
 		SoundFile string `json:"sound_file"`
 		TextFile  string `json:"text_file"`
+		EpubFile  string `json:"epub_file"`
 	} `json:"results"`
 	TaskErrors string `json:"task_errors"`
 }

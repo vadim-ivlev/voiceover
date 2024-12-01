@@ -11,7 +11,7 @@ import (
 // ********************************************************************************************************************
 
 // ProcessFile - processes the input file.
-func ProcessFile() (outMP3File, outTextFile, outTaskFile string, numDone int, err error) {
+func ProcessFile() (outMP3File, outTextFile, outEpubFile, outTaskFile string, numDone int, err error) {
 	startTime := time.Now()
 
 	// Create a new task or restore the previous one
@@ -38,12 +38,18 @@ func ProcessFile() (outMP3File, outTextFile, outTaskFile string, numDone int, er
 		return
 	}
 
+	outEpubFile, err = CreateOutputEpub(task.Params.InputFileName, processedJobs, outputBaseName)
+	if err != nil {
+		return
+	}
+
 	task.StartTime = startTime
 	task.EndTime = time.Now()
 	task.Duration = task.EndTime.Sub(task.StartTime)
 	task.Jobs = processedJobs
 	task.Results.SoundFile = outMP3File
 	task.Results.TextFile = outTextFile
+	task.Results.EpubFile = outEpubFile
 	if len(processedJobs) != numJobs {
 		task.TaskErrors = fmt.Sprintf("Only %d of %d jobs processed.", len(processedJobs), numJobs)
 	}
