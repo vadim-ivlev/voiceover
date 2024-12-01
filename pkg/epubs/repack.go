@@ -178,6 +178,16 @@ func filterLinesByFilePath(epubTextLines []EpubTextLine, filePath string) []Epub
 	return filteredLines
 }
 
+// filerLinesBySelector filters the given slice of EpubTextLine and returns a new slice
+// containing only the lines that match the specified selector.
+//
+// Parameters:
+//   - epubTextLines: A slice of EpubTextLine structs to be filtered.
+//   - selector: The selector to filter the lines by.
+//
+// Returns:
+//
+//	A slice of EpubTextLine structs that have the specified selector.
 func filerLinesBySelector(epubTextLines []EpubTextLine, selector string) []EpubTextLine {
 	var filteredLines []EpubTextLine
 	for _, line := range epubTextLines {
