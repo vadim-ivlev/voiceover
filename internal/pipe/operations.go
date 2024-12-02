@@ -363,7 +363,7 @@ func getEpubTextLines() (epubTextLines []epubs.EpubTextLine, outputBaseName stri
 
 	// check the inpjut file extension
 	if path.Ext(config.Params.InputFileName) == ".epub" {
-		epubTextLines, start, end, err = epubs.GetEpubTextLines(config.Params.InputFileName, config.Params.Start, config.Params.End, epubs.ProcessableSelectors)
+		epubTextLines, start, end, err = epubs.GetEpubTextLines(config.Params.InputFileName, config.Params.Start, config.Params.End, epubs.ProcessableExtensions, epubs.ProcessableSelectors)
 		if err != nil {
 			return
 		}

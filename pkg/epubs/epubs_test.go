@@ -48,7 +48,7 @@ func TestListEpubFiles(t *testing.T) {
 				t.Errorf("ListEpubFiles() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			translatableFiles := listProcessableFiles(got)
+			translatableFiles := listProcessableFiles(got, ProcessableExtensions)
 			fmt.Printf("translatableFiles = \n%s\n", utils.PrettyJSON(translatableFiles))
 
 			ncxContent, err := getFileContent(tt.args.epubPath, translatableFiles[0])
@@ -99,7 +99,7 @@ func TestGetEpubTextLines(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotEpubTexts, err := GetAllEpubTextLines(tt.args.epubPath, tt.args.selectors)
+			gotEpubTexts, err := GetAllEpubTextLines(tt.args.epubPath, ProcessableExtensions, tt.args.selectors)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetEpubTextLines() error = %v, wantErr %v", err, tt.wantErr)
 				return

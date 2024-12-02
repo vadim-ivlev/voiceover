@@ -62,31 +62,27 @@ func filterExtension(files []string, ext string) []string {
 	return filtered
 }
 
-// # listProcessableFiles
+// listProcessableFiles
 //
-// returns a slice of strings containing only the files that can be translated
+// returns a slice of strings containing only the files that can be processed
 //
 // Params:
 //
 //   - files - a list of file names
+//   - fileExtensions - a list of extensions to filter by
 //
 // Return:
 //
 //   - a list of file names with extensions .ncx, .xhtml, and .html
-func listProcessableFiles(files []string) []string {
+func listProcessableFiles(files, fileExtensions []string) []string {
+
 	translatableFiles := []string{}
 
-	ncxs := filterExtension(files, ".ncx")
-	sort.Strings(ncxs)
-	translatableFiles = append(translatableFiles, ncxs...)
-
-	xhtmls := filterExtension(files, ".xhtml")
-	sort.Strings(xhtmls)
-	translatableFiles = append(translatableFiles, xhtmls...)
-
-	htmls := filterExtension(files, ".html")
-	sort.Strings(htmls)
-	translatableFiles = append(translatableFiles, htmls...)
+	for _, ext := range fileExtensions {
+		filtered := filterExtension(files, ext)
+		sort.Strings(filtered)
+		translatableFiles = append(translatableFiles, filtered...)
+	}
 
 	return translatableFiles
 }
@@ -148,6 +144,7 @@ func readAll(r io.Reader) (string, error) {
 //
 // Parameters:
 //   - epubPath: The file path to the EPUB file.
+//   - fileExtensions: A slice of file extensions to filter the files to process.
 //   - selectors: A slice of CSS selectors used to identify the HTML elements to process.
 //
 // Returns:
@@ -160,15 +157,15 @@ func readAll(r io.Reader) (string, error) {
 //  3. Reads the content of each translatable file.
 //  4. Extracts the translatable text lines from the content.
 //  5. Returns a slice of EpubTextLine containing all the extracted text lines.
-func GetAllEpubTextLines(epubPath string, selectors []string) (epubTexts []EpubTextLine, err error) {
+func GetAllEpubTextLines(epubPath string, fileExtensions, selectors []string) (epubTexts []EpubTextLine, err error) {
 	files, err := ListEpubFiles(epubPath)
 	if err != nil {
 		return
 	}
 
-	translatableFiles := listProcessableFiles(files)
+	processableFiles := listProcessableFiles(files, fileExtensions)
 	epubTextLines := []EpubTextLine{}
-	for _, f := range translatableFiles {
+	for _, f := range processableFiles {
 
 		content, err := getFileContent(epubPath, f)
 		if err != nil {
@@ -192,6 +189,7 @@ func GetAllEpubTextLines(epubPath string, selectors []string) (epubTexts []EpubT
 //   - epubPath: The file path to the EPUB file.
 //   - startIndex: The starting index of the text lines to extract.
 //   - endIndex: The ending index of the text lines to extract.
+//   - fileExtensions: A slice of file extensions to filter the files to process.
 //   - selectors: A slice of CSS selectors to filter the text lines.
 //
 // Returns:
@@ -199,8 +197,8 @@ func GetAllEpubTextLines(epubPath string, selectors []string) (epubTexts []EpubT
 //   - start: The actual starting index used for extraction.
 //   - end: The actual ending index used for extraction.
 //   - err: An error object if an error occurred during the extraction process, otherwise nil.
-func GetEpubTextLines(epubPath string, startIndex, endIndex int, selectors []string) (epubTexts []EpubTextLine, start, end int, err error) {
-	allEpubTexts, err := GetAllEpubTextLines(epubPath, selectors)
+func GetEpubTextLines(epubPath string, startIndex, endIndex int, fileExtensions, selectors []string) (epubTexts []EpubTextLine, start, end int, err error) {
+	allEpubTexts, err := GetAllEpubTextLines(epubPath, fileExtensions, selectors)
 	if err != nil {
 		return nil, 0, 0, err
 	}
