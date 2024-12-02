@@ -13,6 +13,8 @@ import (
 	"github.com/vadim-ivlev/voiceover/pkg/utils"
 )
 
+var NumTranslations int32
+
 // JobFunction - function that processes a job.
 // It takes a job and returns a modified job and a possible error.
 type JobFunction func(Job) (Job, error)

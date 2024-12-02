@@ -23,4 +23,4 @@ type EpubTextLine struct {
 
 // ProcessableSelectors contains the list of selectors that can be processed.
 // var ProcessableSelectors = []string{"h1", "h2", "h3", "h4", "h5", "h6", "p", "div"}
-var ProcessableSelectors = []string{"h2", "p"}
+var ProcessableSelectors = []string{"blockquote>span", "h2", "p"}

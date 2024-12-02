@@ -12,6 +12,6 @@ voiceover
 voiceover.zip
 # subderictories of ./texts/
 texts/*/
-
+*.lines-*
 
 

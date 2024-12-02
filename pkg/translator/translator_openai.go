@@ -83,7 +83,9 @@ Clarity and Simplicity
 
 3. Eliminate unnecessary adverbs and rearrange adjectives in accord with %s norms.
 
-4. If there are any inner tags such as <span>, <a> or <small> , try to keep tags in place. Preserve both the formatting and the semantic flow. 
+4. If user's text contains proper names only, just translate them. 
+
+5. If there are any inner tags such as <span>, <a> or <small> , try to keep tags in place. Preserve both the formatting and the semantic flow. 
 
 `
 

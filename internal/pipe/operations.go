@@ -7,6 +7,7 @@ import (
 	"path"
 	"sort"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -79,6 +80,7 @@ func translateTextOperation(job Job) (Job, error) {
 	// job.Results.TranslatedText = translatedText
 
 	// translate the html
+	atomic.AddInt32(&NumTranslations, 1)
 	TranslatedHtml, err := translator.TranslateText(config.Params.OpenaiAPIURL, config.Params.ApiKey, config.Params.TranslateTo, translator.HtmlTranslInstructions, job.Results.Html)
 	if err != nil {
 		return job, err
@@ -184,7 +186,7 @@ func DoPipeline(task Task) (doneJobs []Job, numJobs int, outputBaseName string, 
 
 	// translate the text.
 	// go DoWork(nil, "Translate", "Tr", translateTextOperation, textChan, translChan)
-	doTeamWork(10, "Translate", "Tr", translateTextOperation, textChan, translChan)
+	doTeamWork(30, "Translate", "Tr", translateTextOperation, textChan, translChan)
 
 	// generate sound file for each job. Fan-out.
 	doTeamWork(10, "Sound", "S", soundOperation, translChan, soundChan)
