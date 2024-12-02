@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"math"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -74,10 +75,10 @@ func ParseCommandLine() {
 	flag.StringVar(&Params.FileListFileName, "filelist", "file-list.txt", "File with a list of MP3  files to concatenate.")
 
 	flag.StringVar(&Params.TTSAPI, "ttsapi", "openai", "TTS API to use {openai|google|elevenlabs}.")
-	flag.IntVar(&Params.Start, "s", 0, "Number of the first line of the file to process. Starting from 0.")
-	flag.IntVar(&Params.End, "e", 0, "Number of the last line of the file to process. Last line will not be processed. 0 - process to the end of the file.")
+	flag.IntVar(&Params.Start, "start", 0, "Number of the first line of the file to process. Starting from 0.")
+	flag.IntVar(&Params.End, "end", math.MaxInt, "Number of the last line of the file to process. Last line will not be processed. 0 - process to the end of the file.")
 	flag.StringVar(&Params.Voices, "voices", "", "Comma separated list of voices (alloy,echo,fable,onyx,nova,shimmer). No spaces.")
-	flag.StringVar(&Params.OutputFileName, "o", "", "Output file name. If empty, will be equal to the input file name.")
+	flag.StringVar(&Params.OutputFileName, "output", "", "Output file name. If empty, will be equal to the input file name.")
 	flag.StringVar(&Params.TaskFile, "task", "", "Previous task file to continue processing.")
 	flag.Float64Var(&Params.Speed, "speed", 1.0, "Speed of the voice.")
 	flag.Float64Var(&Params.Pause, "pause", 0.7, "Pause between paragraphs in seconds.")

@@ -34,9 +34,9 @@
             "program": "${workspaceFolder}/cmd/voiceover/main.go",
             "cwd": "${workspaceFolder}",
             "args": [
-                "-s",
+                "-start",
                 "19",
-                "-e",
+                "-end",
                 "20",
                 "-translate",
                 "Russian",
@@ -50,9 +50,9 @@
             "mode": "auto",
             "program": "${workspaceFolder}/cmd/voiceover/main.go",
             "args": [
-                "-s",
+                "-start",
                 "90",
-                "-e",
+                "-end",
                 "100",
                 "-nap",
                 "3000",

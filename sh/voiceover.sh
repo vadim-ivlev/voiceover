@@ -1,4 +1,4 @@
 #!/bin/bash
 
-go run ./cmd/voiceover -s 90 -e 100 -voices nova texts/dahl.txt
+go run ./cmd/voiceover -start 90 -end 100 -voices nova texts/dahl.txt
 

@@ -53,7 +53,7 @@ To use the application:
 export OPENAI_API_KEY=<your-key>
 
 # Run the application
-go run main.go -i input.txt -o output.mp3
+go run main.go -i input.txt -output output.mp3
 ```
 
 
