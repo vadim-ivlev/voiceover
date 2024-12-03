@@ -23,7 +23,7 @@ type EpubTextLine struct {
 
 // ProcessableExtensions contains the list of file extensions that can be processed.
 // ".ncx",
-var ProcessableExtensions = []string{".html", ".xhtml"}
+var ProcessableExtensions = []string{".html"}
 
 // ProcessableSelectors contains the list of selectors that can be processed.
 var ProcessableSelectors = []string{"blockquote>span", "h1", "h2", "h3", "h4", "p"}
