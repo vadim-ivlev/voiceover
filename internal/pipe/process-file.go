@@ -2,8 +2,10 @@ package pipe
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
+	"github.com/vadim-ivlev/voiceover/pkg/epubs"
 	"github.com/vadim-ivlev/voiceover/pkg/texts"
 	"github.com/vadim-ivlev/voiceover/pkg/utils"
 )
@@ -19,6 +21,17 @@ func ProcessFile() (outMP3File, outTextFile, outEpubFile, outTaskFile string, nu
 	if err != nil {
 		return
 	}
+
+	// Wait group for the toc translation
+	wgTableOfContents := sync.WaitGroup{}
+	wgTableOfContents.Add(1)
+	go func() {
+		_, err = epubs.TranslateTablesOfContents(task.Params.InputFileName)
+		if err != nil {
+			task.TaskErrors = fmt.Sprintf(" !!!!!!!!!! Error translating TOC: %v", err)
+		}
+		wgTableOfContents.Done()
+	}()
 
 	// PROCESS PROCESS PROCESS PROCESS the jobs in the pipeline -----------------
 	processedJobs, numJobs, outputBaseName, err := DoPipeline(task)
@@ -37,6 +50,9 @@ func ProcessFile() (outMP3File, outTextFile, outEpubFile, outTaskFile string, nu
 	if err != nil {
 		return
 	}
+
+	// Wait for the TOC translation to finish before creating the output EPUB
+	wgTableOfContents.Wait()
 
 	outEpubFile, err = CreateOutputEpub(task.Params.InputFileName, processedJobs, outputBaseName)
 	if err != nil {

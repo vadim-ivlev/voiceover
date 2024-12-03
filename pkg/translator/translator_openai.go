@@ -49,7 +49,7 @@ curl https://api.openai.com/v1/chat/completions \
 */
 
 var TocTranslInstructions = `
-In the given xml, translate inner texts of the <text> elements to Russian.
+In the given xml, translate inner texts of the <text> elements to %s.
 Keep the all other xml tags as they are.
 Do not change anything else.
 
@@ -137,7 +137,7 @@ func TranslateText(apiURL, apiKey, language, instructions, text string) (transla
 				"content": text,
 			},
 		},
-		"temperature": 1,
+		"temperature": 0.7,
 	}
 
 	jsonData, err := json.MarshalIndent(requestBody, "", "  ")

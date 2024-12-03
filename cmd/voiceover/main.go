@@ -35,12 +35,11 @@ func main() {
 func ResultMessage(mp3File, txtFile, epubFile, taskFile string, numDone int) {
 	log.Info().Msgf(`
 	%d paragraphs processed.
-	%d translations done.
 	Output files
 		MP3 file:  %s
 		Text file: %s
 		Epub file: %s
 		Log file:  %s
 	----------------------------	
-	`, numDone, pipe.NumTranslations, mp3File, epubFile, txtFile, taskFile)
+	`, numDone, mp3File, epubFile, txtFile, taskFile)
 }

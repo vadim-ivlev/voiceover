@@ -155,6 +155,14 @@ func processContent(content, filePath string, epubTextLines []EpubTextLine) (pro
 		}
 	}
 
+	// Check if filePath is in the map of table of contents files that have been supposedly translated
+	// If it is, replace the content with the translated content
+	toc, ok := TablesOfContents[filePath]
+	if ok {
+		fmt.Printf("Processed content for file '%s'\n", filePath)
+		content = toc
+	}
+
 	return content
 }
 
