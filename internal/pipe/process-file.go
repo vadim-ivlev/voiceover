@@ -2,9 +2,11 @@ package pipe
 
 import (
 	"fmt"
+
 	"sync"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"github.com/vadim-ivlev/voiceover/pkg/epubs"
 	"github.com/vadim-ivlev/voiceover/pkg/texts"
 	"github.com/vadim-ivlev/voiceover/pkg/utils"
@@ -36,19 +38,19 @@ func ProcessFile() (outMP3File, outTextFile, outEpubFile, outTaskFile string, nu
 	// PROCESS PROCESS PROCESS PROCESS the jobs in the pipeline -----------------
 	processedJobs, numJobs, outputBaseName, err := DoPipeline(task)
 	if err != nil {
-		return
+		log.Error().Msgf("Failed to process jobs: %v", err)
 	}
 
 	numDone = len(processedJobs)
 
 	outMP3File, err = CreateOutputMP3(processedJobs, outputBaseName)
 	if err != nil {
-		return
+		log.Error().Msgf("Failed to create MP3 file: %v", err)
 	}
 
 	outTextFile, err = CreateOutputText(processedJobs, outputBaseName)
 	if err != nil {
-		return
+		log.Error().Msgf("Failed to create text file: %v", err)
 	}
 
 	// Wait for the TOC translation to finish before creating the output EPUB
@@ -56,7 +58,7 @@ func ProcessFile() (outMP3File, outTextFile, outEpubFile, outTaskFile string, nu
 
 	outEpubFile, err = CreateOutputEpub(task.Params.InputFileName, processedJobs, outputBaseName)
 	if err != nil {
-		return
+		log.Error().Msgf("Failed to create EPUB file: %v", err)
 	}
 
 	task.StartTime = startTime

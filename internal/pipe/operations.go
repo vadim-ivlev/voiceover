@@ -219,6 +219,12 @@ func CreateOutputText(processedJobs []Job, outputBaseName string) (outTextFile s
 
 // CreateOutputEpub - joins the processed jobs into one epub file.
 func CreateOutputEpub(inputEpubFile string, processedJobs []Job, outputBaseName string) (outEpubFile string, err error) {
+	// check if the input file is an epub file
+	if path.Ext(inputEpubFile) != ".epub" {
+		err = fmt.Errorf("input file is not an EPUB file: %s", inputEpubFile)
+		return
+	}
+
 	// remove the output text file if it exists
 	err = os.Remove(outputBaseName + ".epub")
 	if err != nil {

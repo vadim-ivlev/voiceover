@@ -13,9 +13,9 @@ import (
 // flag if the program should stop. 1 - stop, 0 - continue
 var stop int64
 
-// Stop returns true if the program should stop
+// Stopped returns true if the program should stop
 // used atomic operation to read the flag
-func Stop() bool {
+func Stopped() bool {
 	return atomic.LoadInt64(&stop) == 1
 }
 

@@ -59,7 +59,7 @@ func DoWork(wg *sync.WaitGroup, work, workerName string, operation JobFunction, 
 	// for job := range in {
 	for {
 		// check if the program should stop
-		if stopper.Stop() {
+		if stopper.Stopped() {
 			break
 		}
 

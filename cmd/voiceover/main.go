@@ -24,6 +24,7 @@ func main() {
 	mp3File, txtFile, epubFile, taskFile, numDone, err := pipe.ProcessFile()
 	if err != nil {
 		log.Error().Msgf("Failed to process file: %v", err)
+		ResultMessage(mp3File, txtFile, epubFile, taskFile, numDone)
 	} else {
 		ResultMessage(mp3File, txtFile, epubFile, taskFile, numDone)
 	}
