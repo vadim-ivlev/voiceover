@@ -137,7 +137,7 @@ func TranslateText(apiURL, apiKey, language, instructions, text string) (transla
 				"content": text,
 			},
 		},
-		"temperature": 0.7,
+		"temperature": 1.0,
 	}
 
 	jsonData, err := json.MarshalIndent(requestBody, "", "  ")
